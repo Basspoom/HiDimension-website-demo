@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="54px" height="53px" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="BGPattern" patternUnits="userSpaceOnUse" alignment="0 0" imageRepeat="None" />
+    <mask fill="white" id="Clip2">
+      <path d="M 54 53  L 54 0.23733919557071861  L 25.167800118273217 27.854991043803906  L 0.019958604376106415 53  L 54 53  Z " fill-rule="evenodd" />
+    </mask>
+  </defs>
+  <g transform="matrix(1 0 0 1 -1027 -1122 )">
+    <path d="M 54 53  L 54 0.23733919557071861  L 25.167800118273217 27.854991043803906  L 0.019958604376106415 53  L 54 53  Z " fill-rule="nonzero" fill="rgba(2, 167, 240, 1)" stroke="none" transform="matrix(1 0 0 1 1027 1122 )" class="fill" />
+    <path d="M 54 53  L 54 0.23733919557071861  L 25.167800118273217 27.854991043803906  L 0.019958604376106415 53  L 54 53  Z " stroke-width="2" stroke-dasharray="0" stroke="rgba(121, 121, 121, 1)" fill="none" transform="matrix(1 0 0 1 1027 1122 )" class="stroke" mask="url(#Clip2)" />
+  </g>
+</svg>

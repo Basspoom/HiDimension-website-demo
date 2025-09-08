@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页 - 合肥塰维生物科技有限公司</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #17a2b8;
+            --primary-color-dark: #138496;
+            --background-color: #ffffff;
+            --section-background-color: #f8fbfd;
+            --text-color: #333;
+            --subtle-text-color: #555;
+            --heading-color: #111;
+            --white-color: #fff;
+            --border-radius: 16px;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+        
+        /* --- Hero Section --- */
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            text-align: left;
+            padding: 0 10vw;
+            background: url('images/首页/u1_v2.png') no-repeat center center;
+            background-size: contain;
+            background-color: var(--section-background-color);
+            position: relative;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('images/首页/u2.svg') no-repeat center center/cover;
+            opacity: 0.05;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .hero-logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 25px;
+        }
+
+        .hero-title {
+            font-size: 5rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--subtle-text-color);
+            margin-bottom: 40px;
+            font-weight: 300;
+            max-width: 80%;
+        }
+
+        .hero-cta-button {
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .hero-cta-button:hover {
+            background-color: var(--primary-color-dark);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(23, 162, 184, 0.4);
+        }
+
+        /* --- Grid Layout for Content --- */
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        /* --- Content Sections --- */
+        .content-section {
+            padding: 5vw;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity var(--transition-speed) ease-out, transform var(--transition-speed) ease-out;
+        }
+
+        .features-grid .content-section:nth-child(odd) {
+            background-color: var(--background-color);
+        }
+        .features-grid .content-section:nth-child(even) {
+            background-color: var(--section-background-color);
+        }
+
+        /* The original row-reverse for even items is now applied within the grid context */
+        .features-grid > .content-section:nth-child(3),
+        .features-grid > .content-section:nth-child(4) {
+             flex-direction: row; /* Example: adjust order if needed */
+        }
+         .features-grid > .content-section:nth-child(2),
+         .features-grid > .content-section:nth-child(3) {
+            flex-direction: row-reverse;
+         }
+
+
+        .content-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .text-content {
+            flex: 1;
+        }
+
+        .text-content .tagline {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .text-content h2 {
+            font-size: 2.2rem;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+        }
+        
+        .text-content h3 {
+             font-size: 1.5rem;
+             font-weight: 500;
+             margin-top: 20px;
+             margin-bottom: 10px;
+        }
+
+        .text-content p, .text-content li {
+            font-size: 1rem;
+            color: var(--subtle-text-color);
+            line-height: 1.9;
+        }
+        
+        .contact-list {
+            list-style: none;
+            margin-top: 15px;
+            padding-left: 0;
+        }
+        .contact-list li {
+            font-weight: 500;
+        }
+
+        .image-content {
+            flex: 1;
+            text-align: center;
+        }
+
+        .image-content img {
+            max-width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .image-content img:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* --- Footer --- */
+        .main-footer {
+            padding: 40px;
+            text-align: center;
+            background-color: var(--section-background-color);
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Grid */
+        @media (max-width: 992px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .features-grid > .content-section,
+            .features-grid > .content-section:nth-child(2),
+            .features-grid > .content-section:nth-child(3) {
+                flex-direction: column-reverse;
+            }
+            .image-content {
+                order: -1;
+            }
+             .hero-title {
+                font-size: 3.5rem;
+            }
+            .hero-subtitle {
+                font-size: 1.2rem;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="hero-section">
+            <div class="hero-content">
+                <img src="images/首页/u108.png" alt="塰维生物 Logo" class="hero-logo" style="width: 750px; height: 200px;">
+                <h1 class="hero-title">AI驱动的生物智造平台</h1>
+                <p class="hero-subtitle">通过AI × 生物实验平台的深度融合，重塑生命科学研究范式，推动新药研发、蛋白质工程与绿色生物制造的发展。</p>
+                <a href="功能目录页.html" class="hero-cta-button">立即体验</a>
+            </div>
+        </section>
+
+        <div class="features-grid">
+            <section class="content-section animate-on-scroll">
+                <div class="text-content">
+                    <span class="tagline">关于我们</span>
+                    <h2>国际先进生物智造平台</h2>
+                    <p>合肥塰维生物科技有限公司 (NovoBiotech@HiDimension) 致力于打造自主可控、国际先进的生物智造平台。公司由中国科学技术大学科学家团队创立，核心成员具备人工智能、生物信息学、结构生物学、肿瘤免疫及合成生物学等多学科背景。</p>
+                </div>
+                <div class="image-content">
+                    <img src="images/首页/u5.png" alt="科学家团队与科研环境">
+                </div>
+            </section>
+
+            <section class="content-section animate-on-scroll">
+                <div class="image-content">
+                    <img src="images/首页/u6.png" alt="HiModel 基础大模型体系">
+                </div>
+                <div class="text-content">
+                    <span class="tagline">技术核心</span>
+                    <h2>自主研发HiModel基础大模型</h2>
+                    <p>依托自主研发的 HiModel 基础大模型体系，塰维生物构建了涵盖数据采集与清洗、AI 模型训练与验证、实验验证与产品转化的闭环体系。我们的 Bioo 系列模型聚焦生物大分子挖掘、结构预测与从头设计，Hyper 系列模型面向具体生物学场景进行优化与应用，推动从基础研究到产业化的高效转化。</p>
+                </div>
+            </section>
+
+            <section class="content-section animate-on-scroll">
+                <div class="text-content">
+                     <span class="tagline">公司愿景</span>
+                    <h2>打造具国际影响力的智能平台</h2>
+                    <p>公司愿景是通过 AI × 生物实验平台的深度融合，重塑生命科学研究范式，推动新药研发、蛋白质工程与绿色生物制造的发展，打造具有科大特色和国际影响力的智能化生物研发与应用平台。</p>
+                </div>
+                <div class="image-content">
+                    <img src="images/首页/u4.png" alt="AI与生物实验平台深度融合">
+                </div>
+            </section>
+            
+            <section class="content-section animate-on-scroll">
+                <div class="image-content">
+                     <img src="images/首页/u3.png" alt="合作洽谈">
+                </div>
+                 <div class="text-content">
+                     <span class="tagline">合作共赢</span>
+                    <h2>期待与您携手，共创未来</h2>
+                    <h3>合作方向</h3>
+                    <ul class="contact-list">
+                        <li>- 大分子AI模型联合开发</li>
+                        <li>- 蛋白质优化、药物研发、合成生物学应用</li>
+                    </ul>
+                     <h3>联系我们</h3>
+                    <ul class="contact-list">
+                        <li><strong>邮箱:</strong> zhr123456@mail.ustc.edu.cn </li>
+                        <li><strong>电话:</strong> +86-0551-63600406 </li>
+    					<li><strong>传真:</strong> 86-0551-3600406 </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 合肥塰维生物科技有限公司. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Animate on Scroll ---
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            const sections = document.querySelectorAll('.animate-on-scroll');
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,768 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>功能目录页</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 全局样式重置和基础设定 --- */
+        :root {
+            --primary-color: #17a2b8; /* 主色调已更改为蓝绿色 */
+            --background-color: #f4f7fa;
+            --card-background-color: #ffffff;
+            --text-color: #333; /* 主标题将使用此颜色 */
+            --subtle-text-color: #6c757d;
+            --tag-background-color: #e9ecef;
+            --tag-text-color: #495057;
+            --version-bg-color: rgba(23, 162, 184, 0.1); /* 版本框背景颜色 */
+            --version-text-color: #17a2b8; /* 版本框文字颜色 */
+            --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.07);
+            --card-hover-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            /* padding: 50px 20px;  修改padding以适应header */
+            padding-top: 120px; /* 为固定的header留出空间 */
+            padding-bottom: 50px;
+            padding-left: 20px;
+            padding-right: 20px;
+            box-sizing: border-box;
+        }
+        
+        /* --- 顶部导航/Header --- */
+        #u831 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: var(--card-background-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-sizing: border-box;
+        }
+        #u959_img { /* Logo */
+            height: 40px;
+            width: auto;
+        }
+        #u950 { /* 应用 标题 */
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-color);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        #u833 { /* 登录按钮 */
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #u833:hover {
+            background-color: #138496;
+        }
+        #u958 { /* 登录后信息 */
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+
+        /* --- 卡片网格布局 --- */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 40px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto; /* 居中显示 */
+        }
+
+        /* --- 单个卡片样式 --- */
+        .card {
+            background-color: var(--card-background-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .card-image-wrapper {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease-out;
+        }
+        
+        .card:hover .card-image {
+            transform: scale(1.05);
+        }
+
+        .card-content {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0;
+            text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header-version {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--version-text-color);
+            background-color: var(--version-bg-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .card-description {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #555;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .card-tag {
+            background-color: var(--tag-background-color);
+            color: var(--tag-text-color);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .card-tag.primary-tag {
+             background-color: var(--primary-color);
+             color: #fff;
+        }
+        
+        .card.coming-soon {
+             opacity: 0.75;
+             filter: grayscale(80%);
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-10deg);
+            background-color: #ffc107;
+            color: #333;
+            padding: 10px 25px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- 登录/注册 模态框样式 --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-container {
+             transform: scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .modal-close-btn:hover {
+            color: #333;
+        }
+        
+        .modal-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: inherit; /* 继承字体 */
+        }
+        .form-group textarea {
+            resize: vertical; /* 允许垂直调整大小 */
+            min-height: 120px;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .form-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #138496;
+        }
+
+        .form-divider {
+            text-align: center;
+            margin: 25px 0;
+            color: #ccc;
+            position: relative;
+        }
+        .form-divider::before,
+        .form-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background-color: #ddd;
+        }
+        .form-divider::before { left: 0; }
+        .form-divider::after { right: 0; }
+        
+        .switch-form-text {
+            text-align: center;
+        }
+
+        /* 用户信息下拉菜单 */
+        #u951 {
+            position: absolute;
+            top: 70px;
+            right: 40px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            width: 220px;
+            padding: 10px 0;
+            z-index: 1100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+        }
+        #u951.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        #u956 { /* email */
+            padding: 10px 20px;
+            font-weight: 600;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+        }
+        #u951 .menu-item {
+            display: block;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+         #u951 .menu-item:hover {
+             background-color: #f8f9fa;
+         }
+         #u954.menu-item { /* 退出登录 */
+            color: #dc3545;
+            margin-top: 5px;
+            border-top: 1px solid #f0f0f0;
+         }
+
+
+        /* 响应式调整 */
+        @media (max-width: 992px) {
+            .card-container { gap: 30px; }
+        }
+        
+        @media (max-width: 768px) {
+             body { padding: 100px 15px 30px; }
+            .card-container { grid-template-columns: 1fr; gap: 25px; }
+            .card-content { padding: 25px; }
+            #u831 { padding: 0 20px; }
+            #u950 { display: none; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="u831">
+        <img id="u959_img" src="images/首页/u108.png" alt="Logo" style="width: 240px; height: 60px;">
+        <div id="u950"></div>
+        <div class="header-right">
+            <div id="u833" data-label="登录按钮">登录</div>
+            <div id="u958" data-label="登录后信息" style="display: none;">Z</div>
+        </div>
+        <div id="u951" data-label="登录信息悬停框">
+            <div id="u956">zhangsan@example.com</div>
+            <div id="u955" class="menu-item">我的任务</div>
+            <div id="u957" class="menu-item">修改信息</div>
+            <div id="u953" class="menu-item">修改密码</div>
+            <div id="u954" class="menu-item">退出登录</div>
+        </div>
+    </div>
+
+
+    <div class="card-container">
+        <div class="card" id="u765">
+            <div class="card-image-wrapper">
+                <img class="card-image" src="images/功能目录页/u772.png" onerror="this.onerror=null;this.src='https://placehold.co/600x400/17a2b8/FFFFFF?text=Image+Not+Found';">
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">蛋白质低同源检索</h2>
+                    <span class="card-header-version">V0.5</span>
+                </div>
+                <p class="card-description">打破同源束缚，大幅扩展可检索空间与效率，实现序列无关的新型TnpB蛋白高效发现，速度提升十倍，成功鉴定世界最小活性TnpB。</p>
+                <div class="card-tags">
+                    <span class="card-tag primary-tag">蛋白质</span>
+                    <span class="card-tag">检索</span>
+                    <span class="card-tag">向量数据库</span>
+                    <span class="card-tag">Embedding</span>
+                </div>
+            </div>
+        </div>
+        <div class="card" id="u777">
+            <div class="card-image-wrapper">
+                <img class="card-image" src="images/功能目录页/u784.png" onerror="this.onerror=null;this.src='https://placehold.co/600x400/17a2b8/FFFFFF?text=Image+Not+Found';">
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">蛋白质结构补齐</h2>
+                    <span class="card-header-version">V1.0</span>
+                </div>
+                <p class="card-description">基于柔性感知SE(3)编码与物理几何约束，实现结构缺失片段的极速、物理可行且整体一致的自动补齐，显著优于传统采样建模，支持网页交互式操作。</p>
+                <div class="card-tags">
+                    <span class="card-tag primary-tag">蛋白质</span>
+                    <span class="card-tag">结构补齐</span>
+                    <span class="card-tag">插入片段</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="u788">
+            <div class="card-image-wrapper">
+                <img class="card-image" src="images/功能目录页/u795.png" onerror="this.onerror=null;this.src='https://placehold.co/600x400/17a2b8/FFFFFF?text=Image+Not+Found';">
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">蛋白质结构预测</h2>
+                    <span class="card-header-version">V1.0</span>
+                </div>
+                <p class="card-description">打造高效高精度蛋白质结构预测模型，以十分之一时间实现 AlphaFold3 90% 性能，平均推理小于一分钟。</p>
+                <div class="card-tags">
+                    <span class="card-tag primary-tag">蛋白质</span>
+                    <span class="card-tag">结构预测</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="u798">
+            <div class="card-image-wrapper">
+                <img class="card-image" src="images/功能目录页/u805.png" onerror="this.onerror=null;this.src='https://placehold.co/600x400/17a2b8/FFFFFF?text=Image+Not+Found';">
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">蛋白质逆向折叠</h2>
+                    <span class="card-header-version">V1.0</span>
+                </div>
+                <p class="card-description">模型结合实验柔性信息和先进生成技术，高效设计能自发折叠实现功能的可合成氨基酸序列，将结构设想快速转化为实际分子，全面提升效率与精度。</p>
+                <div class="card-tags">
+                    <span class="card-tag primary-tag">蛋白质</span>
+                    <span class="card-tag">逆折叠</span>
+                    <span class="card-tag">序列设计</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="u809">
+            <div class="card-image-wrapper">
+                <img class="card-image" src="images/功能目录页/u11111.png" onerror="this.onerror=null;this.src='https://placehold.co/600x400/17a2b8/FFFFFF?text=Image+Not+Found';">
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">蛋白质热稳定性优化</h2>
+                    <span class="card-header-version">V1.0</span>
+                </div>
+                <p class="card-description">提升蛋白质热稳定性常需通过大量实验筛选有效突变，成本高且效率低；我们通过“结构-柔性”联合表征解析位点特性，结合多指标打分与嗜热蛋白微调模型，智能推荐最优突变方案，大幅降低实验探索成本。</p>
+                <div class="card-tags">
+                    <span class="card-tag primary-tag">蛋白质</span>
+                    <span class="card-tag">突变</span>
+                    <span class="card-tag">稳定性优化</span>
+                    <span class="card-tag">热稳定性</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="u820">
+            <div class="card-image-wrapper">
+                <img class="card-image" src="images/功能目录页/u11112.png" onerror="this.onerror=null;this.src='https://placehold.co/600x400/17a2b8/FFFFFF?text=Image+Not+Found';">
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">密码子优化</h2>
+                    <span class="card-header-version">V1.0</span>
+                </div>
+                <p class="card-description">智能化CDS序列重设计显著提升多种底盘细胞中的蛋白表达效率，单例最高提升超300%。</p>
+                <div class="card-tags">
+                    <span class="card-tag primary-tag">蛋白质</span>
+                    <span class="card-tag">密码子</span>
+                    <span class="card-tag">表达优化</span>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="card" id="feature-wish-card">
+            <div class="card-image-wrapper">
+                <img class="card-image" src="images/功能目录页/wish.png" alt="功能许愿池" onerror="this.onerror=null;this.src='https://placehold.co/600x400/B0E0E6/FFFFFF?text=Tell+Us';">
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">功能许愿池</h2>
+                </div>
+                <p class="card-description">您是否有些特别的需求或创新的想法？告诉我们您希望平台未来能增加什么功能，您的建议对我们至关重要！</p>
+                <div class="card-tags">
+                    <span class="card-tag primary-tag">用户反馈</span>
+                    <span class="card-tag">新功能建议</span>
+                    <span class="card-tag">共创</span>
+                </div>
+            </div>
+        </div>
+	</div>	
+
+    
+    <div id="modal-overlay" class="modal-overlay">
+        <div id="login-panel" class="modal-container">
+             <button id="close-login" class="modal-close-btn">&times;</button>
+             <h2 class="modal-title">登录</h2>
+             <div class="form-group">
+                 <label for="login-email">邮箱地址</label>
+                 <input type="email" id="login-email" placeholder="请输入您的邮箱">
+             </div>
+             <div class="form-group">
+                 <label for="login-password">密码</label>
+                 <input type="password" id="login-password" placeholder="请输入您的密码">
+             </div>
+             <div class="form-actions">
+                 <span id="forgot-password-link" class="form-link">忘记密码？</span>
+             </div>
+             <button class="submit-btn">登录</button>
+             <div class="form-divider">或</div>
+             <p class="switch-form-text">还没有账户？ <span id="show-register-link" class="form-link">立即注册</span></p>
+        </div>
+        <div id="register-panel" class="modal-container" style="display: none;">
+            <button id="close-register" class="modal-close-btn">&times;</button>
+             <h2 class="modal-title">注册</h2>
+             <div class="form-group">
+                 <label for="register-email">邮箱地址*</label>
+                 <input type="email" id="register-email" placeholder="请输入您的邮箱">
+             </div>
+             <div class="form-group">
+                 <label for="register-password">密码*</label>
+                 <input type="password" id="register-password" placeholder="请输入您的密码">
+             </div>
+             <button class="submit-btn">注册</button>
+             <div class="form-divider"></div>
+             <p class="switch-form-text">已有账户？ <span id="show-login-link" class="form-link">立即登录</span></p>
+        </div>
+         <div id="forgot-password-panel" class="modal-container" style="display: none;">
+             <button id="close-forgot" class="modal-close-btn">&times;</button>
+             <h2 class="modal-title">忘记密码</h2>
+             <div class="form-group">
+                 <label for="forgot-email">邮箱地址</label>
+                 <input type="email" id="forgot-email" placeholder="请输入您的注册邮箱">
+             </div>
+             <button class="submit-btn">发送重置链接</button>
+             <div class="form-divider"></div>
+             <p class="switch-form-text"><span id="back-to-login-link" class="form-link">返回登录</span></p>
+        </div>
+        <div id="wish-panel" class="modal-container" style="display: none;">
+             <button id="close-wish" class="modal-close-btn">&times;</button>
+             <h2 class="modal-title">您的建议，我们的动力</h2>
+             <div class="form-group">
+                 <label for="feature-suggestion">功能建议</label>
+                 <textarea id="feature-suggestion" placeholder="请详细描述您希望我们开发的功能、应用场景或您遇到的问题..."></textarea>
+             </div>
+             <button id="submit-wish-btn" class="submit-btn">提交建议</button>
+        </div>
+        <div id="thank-you-panel" class="modal-container" style="display: none;">
+            <h2 class="modal-title">感谢您的反馈！</h2>
+            <p style="text-align: center; font-size: 16px; color: #555; line-height: 1.7;">我们已经收到了您的宝贵建议，这将是我们不断改进和创新的重要动力。产品团队将会认真评估您的想法。谢谢！</p>
+            <button id="close-thank-you-btn" class="submit-btn" style="margin-top: 30px;">关闭</button>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginButton = document.getElementById('u833');
+            const userAvatar = document.getElementById('u958');
+            const userMenu = document.getElementById('u951');
+            const modalOverlay = document.getElementById('modal-overlay');
+
+            // --- 获取所有面板 ---
+            const loginPanel = document.getElementById('login-panel');
+            const registerPanel = document.getElementById('register-panel');
+            const forgotPasswordPanel = document.getElementById('forgot-password-panel');
+            const wishPanel = document.getElementById('wish-panel'); // 新增
+            const thankYouPanel = document.getElementById('thank-you-panel'); // 新增
+            
+            // --- 获取功能许愿卡片 ---
+            const featureWishCard = document.getElementById('feature-wish-card'); // 新增
+
+			// --- 页面跳转 ---
+			document.getElementById('u765').addEventListener('click', function() {
+				window.location.href = '功能-蛋白质低同源检索.html';
+			});
+            document.getElementById('u798').addEventListener('click', function() {
+				window.location.href = '功能-蛋白质逆向折叠.html';
+			});
+			document.getElementById('u777').addEventListener('click', function() {
+				window.location.href = '功能-蛋白质结构补齐.html';
+			});
+            document.getElementById('u788').addEventListener('click', function() {
+				window.location.href = '功能-蛋白质结构预测.html';
+			});
+			document.getElementById('u809').addEventListener('click', function() {
+				window.location.href = '功能-蛋白质热稳定性优化.html';
+			});
+            document.getElementById('u820').addEventListener('click', function() {
+				window.location.href = '功能-密码子优化.html';
+			});
+
+            // --- 切换登录/未登录状态 (模拟) ---
+            let isLoggedIn = false; 
+            function toggleLoginState() {
+                isLoggedIn = !isLoggedIn;
+                if (isLoggedIn) {
+                    loginButton.style.display = 'none';
+                    userAvatar.style.display = 'flex';
+                } else {
+                    loginButton.style.display = 'block';
+                    userAvatar.style.display = 'none';
+                    userMenu.classList.remove('active');
+                }
+            }
+            
+            // --- 模态框逻辑 ---
+            function showModal(panelToShow) {
+                // 隐藏所有面板
+                [loginPanel, registerPanel, forgotPasswordPanel, wishPanel, thankYouPanel].forEach(p => p.style.display = 'none');
+                // 显示指定的面板
+                panelToShow.style.display = 'block';
+                modalOverlay.classList.add('active');
+            }
+
+            function hideModal() {
+                modalOverlay.classList.remove('active');
+            }
+
+            // --- 事件监听 ---
+
+            // 打开登录
+            loginButton.addEventListener('click', () => showModal(loginPanel));
+            
+            // 登录、注册、忘记密码之间的切换
+            document.getElementById('show-register-link').addEventListener('click', () => showModal(registerPanel));
+            document.getElementById('show-login-link').addEventListener('click', () => showModal(loginPanel));
+            document.getElementById('back-to-login-link').addEventListener('click', () => showModal(loginPanel));
+            document.getElementById('forgot-password-link').addEventListener('click', () => showModal(forgotPasswordPanel));
+            
+            // 【新增】打开功能许愿面板
+            featureWishCard.addEventListener('click', () => showModal(wishPanel));
+
+            // 【新增】提交功能建议
+            document.getElementById('submit-wish-btn').addEventListener('click', function() {
+                // 在这里可以添加代码来获取textarea中的内容并发送到后端
+                // const suggestion = document.getElementById('feature-suggestion').value;
+                // console.log('用户建议:', suggestion);
+                showModal(thankYouPanel); // 显示感谢面板
+            });
+
+            // 所有关闭按钮
+            document.getElementById('close-login').addEventListener('click', hideModal);
+            document.getElementById('close-register').addEventListener('click', hideModal);
+            document.getElementById('close-forgot').addEventListener('click', hideModal);
+            document.getElementById('close-wish').addEventListener('click', hideModal); // 新增
+            document.getElementById('close-thank-you-btn').addEventListener('click', hideModal); // 新增
+
+
+            // 点击遮罩层关闭
+            modalOverlay.addEventListener('click', function(event) {
+                if (event.target === modalOverlay) {
+                    hideModal();
+                }
+            });
+
+            // 模拟登录成功
+            loginPanel.querySelector('.submit-btn').addEventListener('click', function(){
+                hideModal();
+                toggleLoginState();
+            });
+
+
+            // --- 用户菜单下拉 ---
+            userAvatar.addEventListener('click', function(event) {
+                event.stopPropagation();
+                userMenu.classList.toggle('active');
+            });
+            
+            // 点击页面其他地方关闭菜单
+            document.addEventListener('click', function() {
+                 userMenu.classList.remove('active');
+            });
+
+            // 模拟退出登录
+            document.getElementById('u954').addEventListener('click', function(){
+                 toggleLoginState();
+            });
+
+        });
+    </script>
+</body>
+</html>

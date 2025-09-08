@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>功能详情页 - 蛋白质结构补齐</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #17a2b8;
+            --background-color: #f4f7fa;
+            --card-background-color: #ffffff;
+            --text-color: #333;
+            --subtle-text-color: #6c757d;
+            --border-color: #dee2e6;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding-top: 80px;
+        }
+        
+        #header-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: var(--card-background-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-sizing: border-box;
+        }
+        
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-color);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .main-container {
+            max-width: 1440px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(244, 247, 250, 0.1));
+            border-radius: var(--border-radius);
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid #e0e8f0;
+        }
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0;
+        }
+        .page-header p {
+            font-size: 18px;
+            color: var(--subtle-text-color);
+            margin-top: 10px;
+            max-width: 80%;
+        }
+
+        .content-card {
+            background-color: var(--card-background-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+        }
+        .content-card h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+            display: inline-block;
+        }
+        .content-card p, .content-card ul {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+        }
+        .content-card strong {
+            color: var(--text-color);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        .tab-link {
+            padding: 12px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--subtle-text-color);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            transform: translateY(2px);
+        }
+        .tab-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab-content, .detail-tab-content { display: none; }
+        .tab-content.active, .detail-tab-content.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group { margin-bottom: 25px; }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            min-height: 250px; 
+            resize: vertical; 
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
+        }
+        .upload-area { display: flex; align-items: center; gap: 15px; }
+        .upload-btn {
+            padding: 12px 20px; background-color: #e9ecef; color: #495057;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            cursor: pointer; font-weight: 600; transition: all 0.2s;
+        }
+        .upload-btn:hover { background-color: #d8dde2; }
+
+        .action-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 40px; }
+        .btn { padding: 15px 40px; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; border: none; transition: all 0.3s ease; }
+        .btn-primary { background-color: var(--primary-color); color: white; box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3); }
+        .btn-primary:hover { background-color: #138496; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4); }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; }
+
+        .output-actions { margin-top: 25px; display: flex; gap: 15px; }
+    </style>
+</head>
+<body>
+
+    <header id="header-nav">
+        <a href="首页.html"><img src="images/首页/u108.png" alt="Logo" style="width: 240px; height: 60px;"></a>
+        <div class="header-title">蛋白质结构补齐 - 功能详情</div>
+    </header>
+
+    <div class="main-container">
+        <div class="mb-6">
+            <a href="功能目录页.html" class="text-sm font-medium text-cyan-700 hover:text-cyan-900 transition-colors duration-200 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                回到功能目录
+            </a>
+        </div>
+        <header class="page-header">
+            <h1>蛋白质结构补齐</h1>
+            <p>对晶体/冷冻电镜结构中缺失的片段（末端、插入段）进行快速补齐，输出物理可行、与整体几何一致的全长结构。</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <div class="lg:col-span-7 flex flex-col gap-8">
+                <section class="content-card" id="input-parameters-section">
+                    <h2>输入结构</h2>
+                    <div class="form-group">
+                        <label for="pdb-input" class="form-label">输入含缺失段的PDB结构文本</label>
+                        <textarea id="pdb-input" class="form-textarea" placeholder="请在此处粘贴PDB格式的文本..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">或上传PDB文件</label>
+                        <div class="upload-area">
+                            <button class="upload-btn" onclick="document.getElementById('file-upload').click();">选择文件</button>
+                            <span id="file-name">未选择任何文件</span>
+                            <input type="file" id="file-upload" accept=".pdb" style="display: none;">
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="run-btn">运行结构补齐</button>
+                        <button class="btn btn-secondary" id="clear-btn">清空</button>
+                    </div>
+                    <div id="loader" class="text-center mt-4" style="display: none;">
+                        <svg class="animate-spin h-8 w-8 text-cyan-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <p class="mt-2 text-gray-600">正在补齐结构，请稍候...</p>
+                    </div>
+                </section>
+                
+                <section class="content-card" id="output-section" style="display: none;">
+                     <h2>结果预览</h2>
+                     <p>结构补齐完成！您可以下载补齐后的PDB文件，并在本地使用Pymol等专业软件进行三维结构查看与分析。</p>
+                     <div class="output-actions">
+                        <button class="btn btn-primary text-sm px-4 py-2" id="download-btn">下载结果 (.pdb)</button>
+                     </div>
+                </section>
+            </div>
+
+            <div class="lg:col-span-5">
+                <div class="sticky top-28 flex flex-col gap-8">
+                    <section id="details-section" class="content-card">
+                        <nav class="tabs">
+                            <button class="tab-link active" onclick="openDetailTab(event, 'intro-content')">能力介绍</button>
+                            <button class="tab-link" onclick="openDetailTab(event, 'example-content')">使用示例</button>
+                        </nav>
+
+                        
+                        <div id="intro-content" class="detail-tab-content active">
+                            <h2>能力介绍</h2>
+                            <p>很多PDB条目在低分辨密度处存在缺失残基；传统loop建模通过约束与采样补全该区段。我们提供基于深度学习的补齐方法，以显著提升速度与结构一致性。</p>
+
+                            <ul class="list-disc list-inside mt-4 space-y-2">
+                                <li><strong>性能亮点:</strong> 柔性感知的 SE(3) 编码器在缺失区邻域聚合上下文几何，结合约束式补齐与几何体检（键长/角、冲突）以减少不良构象。</li>
+                                <li><strong>模型优势:</strong> B-factor先验提示可动性，模型在缺失段两端与邻域框架上做条件化生成，并联动几何与碰撞体检，降低不合理折返。</li>
+                                <li><strong>操作简便:</strong> 用户上传含缺失段的结构，可一键补齐并导出PDB结构文件，便于进一步的分析与应用。</li>
+                            </ul>
+                        </div>
+                        <div id="example-content" class="detail-tab-content">
+                            <h2>使用示例</h2>
+                            <p>下图展示了上传含缺失片段的PDB文件后，一键运行补齐并获得可下载结果的流程。点击图片可查看大图。</p>
+                            <img src="images/功能详情页-蛋白质结构补齐/12.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <!-- 参考文献 (底部全宽) -->
+        <section id="references-section" class="content-card mt-8">
+            <h2>引用文献</h2>
+            <blockquote><p>当前阶段未纳入引用文献，待内容进一步完善后将补充相关支撑文献。 <a</a></p></blockquote>
+        </section>
+
+    </div>
+
+    <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 z-[2000] flex items-center justify-center p-4 hidden transition-opacity duration-300">
+        <span id="close-modal" class="absolute top-4 right-6 text-white text-5xl font-bold cursor-pointer hover:text-gray-300">&times;</span>
+        <img id="modal-image" src="" alt="放大的示例图片" class="max-w-full max-h-full rounded-lg shadow-2xl">
+    </div>
+
+    <script>
+        function openDetailTab(evt, tabName) {
+            const tabcontent = document.querySelectorAll("#details-section .detail-tab-content");
+            tabcontent.forEach(tab => tab.classList.remove('active'));
+            const tablinks = document.querySelectorAll("#details-section .tab-link");
+            tablinks.forEach(link => link.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        const fileUpload = document.getElementById('file-upload');
+        const fileNameSpan = document.getElementById('file-name');
+        fileUpload.addEventListener('change', () => { 
+            fileNameSpan.textContent = fileUpload.files.length > 0 ? fileUpload.files[0].name : '未选择任何文件';
+        });
+
+        const clearBtn = document.getElementById('clear-btn');
+        const outputSection = document.getElementById('output-section');
+        clearBtn.addEventListener('click', () => {
+            document.getElementById('pdb-input').value = '';
+            fileUpload.value = '';
+            fileNameSpan.textContent = '未选择任何文件';
+            outputSection.style.display = 'none';
+        });
+
+        const runBtn = document.getElementById('run-btn');
+        const loader = document.getElementById('loader');
+        const mockPdbResult = `ATOM      1  N   MET A   1      27.289  34.685  27.289  1.00 20.00           N
+ATOM      2  CA  MET A   1      27.813  35.912  27.813  1.00 20.00           C
+... (此处省略大量PDB内容) ...
+ATOM   1234  OXT ILE A 150      50.123  12.456  33.987  1.00 25.00           O
+TER`;
+
+        runBtn.addEventListener('click', () => {
+            loader.style.display = 'block';
+            runBtn.disabled = true;
+            clearBtn.disabled = true;
+            setTimeout(() => {
+                loader.style.display = 'none';
+                runBtn.disabled = false;
+                clearBtn.disabled = false;
+                outputSection.style.display = 'block';
+                outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 2000);
+        });
+
+        document.getElementById('download-btn').addEventListener('click', () => {
+            const pdbContent = mockPdbResult;
+            const blob = new Blob([pdbContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'completed_structure.pdb';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-image');
+        const closeModalBtn = document.getElementById('close-modal');
+
+        function openImageModal(src) {
+            modalImg.src = src;
+            modal.classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            modal.classList.add('hidden');
+        }
+
+        closeModalBtn.addEventListener('click', closeImageModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) { closeImageModal(); }
+        });
+    </script>
+</body>
+</html>
