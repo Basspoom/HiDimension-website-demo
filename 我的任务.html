@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>我的任务</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --primary-color:#17a2b8;
+      --background-color:#f4f7fa;
+      --card-background-color:#fff;
+      --text-color:#333;
+      --border-radius:16px;
+      --card-shadow:0 8px 16px rgba(0,0,0,.07);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--background-color);font-family:'Inter','Noto Sans SC',sans-serif;color:var(--text-color)}
+    header{position:sticky;top:0;z-index:10;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);padding:16px 24px;display:flex;align-items:center;gap:16px}
+    header img{height:40px;cursor:pointer}
+    .wrap{max-width:1200px;margin:32px auto;padding:0 20px}
+    .toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    .search{flex:1;min-width:260px;display:flex;gap:8px}
+    .search input{flex:1;padding:12px 14px;border:1px solid #dde1e6;border-radius:10px;font-size:14px}
+    .search button,.btn{padding:12px 16px;border:none;border-radius:10px;background:var(--primary-color);color:#fff;cursor:pointer;font-weight:700}
+    .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-color);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    .card{background:#fff;border-radius:var(--border-radius);box-shadow:var(--card-shadow);padding:18px}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{border:1px solid #e6eaef;padding:12px 10px;text-align:left;white-space:nowrap}
+    th{background:#f8fbfd}
+    td a{color:var(--primary-color);text-decoration:none}
+    .empty{padding:36px;text-align:center;color:#6c757d}
+    .hint{margin-top:10px;color:#6c757d;font-size:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <a href="首页.html"><img src="images/首页/u108.png" alt="Logo" style="width: 240px; height: 60px;"></a>
+    <div class="header-title">我的任务</div>
+    <div style="margin-left:auto">
+      <button class="btn" onclick="location.href='功能目录页.html'">返回功能目录</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="toolbar">
+        <div class="search">
+          <input id="q" type="search" placeholder="搜索任务类型或时间（例如：蛋白质、2025-09-01 10:25）">
+          <button onclick="doSearch()">搜索</button>
+        </div>
+        <button class="btn" onclick="resetSearch()">重置</button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="taskTable">
+          <thead>
+            <tr>
+              <th>任务类型</th>
+              <th>提交时间</th>
+              <th>完成时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 仅示例数据，可按需替换为真实列表 -->
+            <tr>
+              <td>蛋白质低同源检索</td>
+              <td>2025-09-01 10:25:20</td>
+              <td>2025-09-01 10:25:40</td>
+              <td><a href="javascript:void(0)">查看</a></td>
+            </tr>
+            <tr>
+              <td>蛋白质结构补齐</td>
+              <td>2025-09-01 10:25:20</td>
+              <td>2025-09-01 10:25:40</td>
+              <td><a href="javascript:void(0)">查看</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div id="empty" class="empty" style="display:none">未找到匹配的任务</div>
+        <div class="hint">提示：当前为演示数据，后续可以替换为真实接口返回的列表。</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function doSearch(){
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const rows = [...document.querySelectorAll('#taskTable tbody tr')];
+      let shown = 0;
+      rows.forEach(tr=>{
+        const text = tr.innerText.toLowerCase();
+        const hit = !q || text.includes(q);
+        tr.style.display = hit ? '' : 'none';
+        if(hit) shown++;
+      });
+      document.getElementById('empty').style.display = shown? 'none':'block';
+    }
+    function resetSearch(){
+      document.getElementById('q').value = '';
+      doSearch();
+    }
+    // 初始一次
+    doSearch();
+  </script>
+</body>
+</html>

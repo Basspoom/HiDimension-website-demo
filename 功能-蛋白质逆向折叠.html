@@ -324,6 +324,23 @@
                             <h2>使用示例</h2>
                             <p>下图展示了输入PDB结构并设置参数后，生成候选序列并预览结果的完整流程。点击图片可查看大图。</p>
                             <img src="images/功能详情页-蛋白质逆向折叠/11.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
+
+                            <!-- 示例文件下载（新增） -->
+                            <div class="output-actions" style="margin-top:16px;">
+                                <a class="btn btn-primary text-sm px-4 py-2"
+                                   href="files/功能详情页-蛋白质逆向折叠/example.pdb"
+                                   download="example.pdb">
+                                   下载示例输入（PDB）
+                                </a>
+                              
+                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
+                                   href="files/功能详情页-蛋白质逆向折叠/example.fasta"
+                                   download="9kpp_pred.fasta">
+                                   下载示例输出（FASTA）
+                                </a>
+                              </div>
+
+
                         </div>
                     </section>
                 </div>
@@ -343,7 +360,32 @@
     </div>
 
     <script>
-        // Tab 切换 (输入/参数)
+        function forceDownload(el){
+            // 如果是本地 file:// 打开，很多浏览器会无视 download，建议用 http 方式访问
+            if (location.protocol === 'file:') {
+                alert('建议用本地 HTTP 服务打开页面：例如运行  python -m http.server  后访问 http://localhost:8000');
+            }
+            const url = el.href;
+            const filename = el.getAttribute('download') || url.split('/').pop();
+            fetch(url).then(r => {
+                if (!r.ok) throw new Error('fetch failed');
+                return r.blob();
+            }).then(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(a.href);
+                a.remove();
+            }).catch(()=>{
+                // 兜底退回普通跳转
+                window.location.href = url;
+            });
+            return false; // 阻止默认跳转
+            }
+
+// Tab 切换 (输入/参数)
         function openTab(evt, tabName) {
             const tabcontent = document.querySelectorAll("#input-parameters-section .tab-content");
             tabcontent.forEach(tab => tab.style.display = "none");

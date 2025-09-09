@@ -310,6 +310,50 @@
                             <h2>使用示例</h2>
                             <p>下图展示了输入PDB和FASTA文件，并设置参数后，一键运行优化并获得可下载结果的流程。点击图片可查看大图。</p>
                             <img src="images/功能详情页-蛋白质热稳定性优化/14.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
+
+                            <!-- 示例文件下载（新增） -->
+                            <!-- <div class="output-actions" style="margin-top:16px;">
+                                <a class="btn btn-primary text-sm px-4 py-2"
+                                   href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.fasta"
+                                   download="t4rnl2.fasta">
+                                   下载示例输入（FASTA）
+                                </a>
+                                <div class="output-actions" style="margin-top:16px;">
+                                    <a class="btn btn-primary text-sm px-4 py-2"
+                                       href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.pdb"
+                                       download="t4rnl2.pdb">
+                                       下载示例输入（PDB）
+                                    </a>                              
+                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
+                                   href="files/功能详情页-蛋白质热稳定性优化/optimized_example_Tm.fasta"
+                                   download="optimized_example_Tm.fasta">
+                                   下载示例输出（FASTA） -->
+                            <section class="content-card">
+                            <h2>示例文件下载</h2>
+                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                <a class="btn btn-primary text-sm px-4 py-2"
+                                    href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.fasta"
+                                    download="t4rnl2.fasta">
+                                下载示例输入（FASTA）
+                                </a>
+                            
+                                <span class="hidden sm:inline-block w-px h-6 bg-gray-200"></span>
+                            
+                                <a class="btn btn-primary text-sm px-4 py-2"
+                                    href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.pdb"
+                                    download="t4rnl2.pdb">
+                                下载示例输入（PDB）
+                                </a>
+                            
+                                <span class="hidden sm:inline-block w-px h-6 bg-gray-200"></span>
+                            
+                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
+                                    href="files/功能详情页-蛋白质热稳定性优化/optimized_example_Tm.fasta"
+                                    download="optimized_example_Tm.fasta">
+                                下载示例输出（FASTA）
+                                </a>
+
+                            </div>
                         </div>
                     </section>
                 </div>
@@ -329,6 +373,32 @@
     </div>
 
     <script>
+        function forceDownload(el){
+            // 如果是本地 file:// 打开，很多浏览器会无视 download，建议用 http 方式访问
+            if (location.protocol === 'file:') {
+                alert('建议用本地 HTTP 服务打开页面：例如运行  python -m http.server  后访问 http://localhost:8000');
+            }
+            const url = el.href;
+            const filename = el.getAttribute('download') || url.split('/').pop();
+            fetch(url).then(r => {
+                if (!r.ok) throw new Error('fetch failed');
+                return r.blob();
+            }).then(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(a.href);
+                a.remove();
+            }).catch(()=>{
+                // 兜底退回普通跳转
+                window.location.href = url;
+            });
+            return false; // 阻止默认跳转
+            }
+
+
         function openTab(evt, tabName) {
             document.querySelectorAll("#input-parameters-section .tab-content").forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll("#input-parameters-section .tab-link").forEach(link => link.classList.remove('active'));

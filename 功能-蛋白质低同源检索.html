@@ -380,7 +380,7 @@
                     </nav>
                     <!-- 输入 Tab -->
                     <div id="input-tab" class="tab-content active">
-                        <div class="form-group"><label for="fasta-sequence" class="form-label">输入蛋白质FASTA序列</label><textarea id="fasta-sequence" class="form-textarea" placeholder=">Protein_A\nMQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE"></textarea></div>
+                        <div class="form-group"><label for="fasta-sequence" class="form-label">输入蛋白质FASTA序列</label><textarea id="fasta-sequence" class="form-textarea" placeholder="MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE"></textarea></div>
                         <div class="form-group"><label class="form-label">或上传FASTA文件</label><div class="upload-area"><button class="upload-btn" onclick="document.getElementById('file-upload').click();">选择文件</button><span id="file-name">未选择任何文件</span><input type="file" id="file-upload" accept=".fasta,.fa" style="display: none;"></div></div>
                     </div>
                     <!-- 参数 Tab -->
@@ -434,6 +434,20 @@
                             <h2>使用示例</h2>
                             <p>点击下方图片可查看完整大图。</p>
                             <img src="images/功能详情页-蛋白质低同源检索/11.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
+
+                            <!-- 示例文件下载（新增） -->
+                            <div class="output-actions" style="margin-top:16px;">
+                                <a class="btn btn-primary text-sm px-4 py-2"
+                                href="files/功能详情页-蛋白质低同源检索/example.fasta"
+                                download="example.fasta">
+                                下载示例输入（FASTA）
+                                </a>
+
+                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
+                                href="files/功能详情页-蛋白质低同源检索/example_virus.csv"
+                                download="example_virus.csv">
+                                下载示例输出（CSV）
+                                </a>
                         </div>
                     </section>
                 </div>
@@ -453,6 +467,32 @@
     </div>
 
     <script>
+        // 下载示例文件
+        function forceDownload(el){
+          // 如果是本地 file:// 打开，很多浏览器会无视 download，建议用 http 方式访问
+          if (location.protocol === 'file:') {
+              alert('建议用本地 HTTP 服务打开页面：例如运行  python -m http.server  后访问 http://localhost:8000');
+          }
+          const url = el.href;
+          const filename = el.getAttribute('download') || url.split('/').pop();
+          fetch(url).then(r => {
+              if (!r.ok) throw new Error('fetch failed');
+              return r.blob();
+          }).then(blob => {
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              URL.revokeObjectURL(a.href);
+              a.remove();
+          }).catch(()=>{
+                // 兜底退回普通跳转
+              window.location.href = url;
+          });
+          return false; // 阻止默认跳转
+          }
+            
         // Tab 切换 (输入/参数)
         function openTab(evt, tabName) {
             const tabcontent = document.querySelectorAll("#input-parameters-section .tab-content");

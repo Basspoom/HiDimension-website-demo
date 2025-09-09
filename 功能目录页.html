@@ -426,6 +426,10 @@
             #u950 { display: none; }
         }
 
+		#u959_img {
+			cursor: pointer;
+		}
+
     </style>
 </head>
 <body>
@@ -457,7 +461,7 @@
                     <h2 class="card-title">蛋白质低同源检索</h2>
                     <span class="card-header-version">V0.5</span>
                 </div>
-                <p class="card-description">打破同源束缚，大幅扩展可检索空间与效率，实现序列无关的新型TnpB蛋白高效发现，速度提升十倍，成功鉴定世界最小活性TnpB。</p>
+                <p class="card-description">打破同源束缚，大幅扩展可检索空间与效率，可发现序列相似性低但结构同源性高的蛋白质。此模型曾成功挖掘出世界目前已知最小长度且具有活性的TnpB。</p>
                 <div class="card-tags">
                     <span class="card-tag primary-tag">蛋白质</span>
                     <span class="card-tag">检索</span>
@@ -635,6 +639,69 @@
             <p style="text-align: center; font-size: 16px; color: #555; line-height: 1.7;">我们已经收到了您的宝贵建议，这将是我们不断改进和创新的重要动力。产品团队将会认真评估您的想法。谢谢！</p>
             <button id="close-thank-you-btn" class="submit-btn" style="margin-top: 30px;">关闭</button>
         </div>
+
+        <!-- 修改信息面板 -->
+        <div id="profile-panel" class="modal-container" style="display:none;">
+            <button id="close-profile" class="modal-close-btn">&times;</button>
+            <h2 class="modal-title">修改信息</h2>
+        
+            <div class="form-group">
+            <label>真实姓名</label>
+            <input type="text" id="prof-name" placeholder="选填">
+            </div>
+        
+            <div class="form-group">
+            <label>机构单位</label>
+            <input type="text" id="prof-org" placeholder="选填">
+            </div>
+        
+            <div class="form-group">
+            <label>研究领域</label>
+            <input type="text" id="prof-field" placeholder="选填">
+            </div>
+        
+            <div class="form-group">
+            <label>职位</label>
+            <input list="title-options" id="prof-title" placeholder="选填（可从列表选择）">
+            <datalist id="title-options">
+                <option value="本科">
+                <option value="研究生">
+                <option value="副教授">
+                <option value="教授">
+                <option value="工程师">
+                <option value="其他">
+            </datalist>
+            </div>
+        
+            <div class="form-group">
+            <label>所在地区</label>
+            <input type="text" id="prof-region" placeholder="选填">
+            </div>
+        
+            <button id="save-profile" class="submit-btn">保存</button>
+        </div>
+
+        <!-- 修改密码面板 -->
+        <div id="password-panel" class="modal-container" style="display:none;">
+            <button id="close-password" class="modal-close-btn">&times;</button>
+            <h2 class="modal-title">修改密码</h2>
+        
+            <div class="form-group">
+            <label>当前密码</label>
+            <input type="password" id="pwd-old" placeholder="请输入当前密码">
+            </div>
+            <div class="form-group">
+            <label>新密码</label>
+            <input type="password" id="pwd-new" placeholder="至少 8 位">
+            </div>
+            <div class="form-group">
+            <label>确认新密码</label>
+            <input type="password" id="pwd-new2" placeholder="再次输入新密码">
+            </div>
+        
+            <button id="save-password" class="submit-btn">确认修改</button>
+        </div>
+ 
     </div>
 
 
@@ -688,19 +755,30 @@
                     userMenu.classList.remove('active');
                 }
             }
+
+			// --- 点击 Logo 跳转到首页 ---
+			document.getElementById('u959_img').addEventListener('click', function() {
+				window.location.href = '首页.html';
+			});
             
             // --- 模态框逻辑 ---
             function showModal(panelToShow) {
-                // 隐藏所有面板
-                [loginPanel, registerPanel, forgotPasswordPanel, wishPanel, thankYouPanel].forEach(p => p.style.display = 'none');
-                // 显示指定的面板
-                panelToShow.style.display = 'block';
-                modalOverlay.classList.add('active');
+            // 隐藏 overlay 里的所有 .modal-container
+            document.querySelectorAll('#modal-overlay .modal-container')
+                .forEach(p => p.style.display = 'none');
+
+            // 显示指定面板
+            panelToShow.style.display = 'block';
+            modalOverlay.classList.add('active');
             }
 
             function hideModal() {
-                modalOverlay.classList.remove('active');
+            modalOverlay.classList.remove('active');
+            // 为了保险，顺手把所有面板也关掉
+            document.querySelectorAll('#modal-overlay .modal-container')
+                .forEach(p => p.style.display = 'none');
             }
+
 
             // --- 事件监听 ---
 
@@ -761,6 +839,64 @@
             document.getElementById('u954').addEventListener('click', function(){
                  toggleLoginState();
             });
+
+            // 取面板引用
+            const profilePanel = document.getElementById('profile-panel');
+
+            // 打开「修改信息」
+            document.getElementById('u957').addEventListener('click', (e)=>{
+            e.stopPropagation();
+            userMenu.classList.remove('active');
+            showModal(profilePanel);
+            });
+
+            // 关闭与保存
+            document.getElementById('close-profile').addEventListener('click', hideModal);
+            document.getElementById('save-profile').addEventListener('click', ()=>{
+            // 这里是演示，不做必填校验与持久化
+            hideModal();
+            alert('信息已保存');
+            });
+
+            // 修改密码
+            const passwordPanel = document.getElementById('password-panel');
+            document.getElementById('u953').addEventListener('click', (e)=>{
+            e.stopPropagation();
+            userMenu.classList.remove('active');
+            showModal(passwordPanel);
+            });
+
+            document.getElementById('close-password').addEventListener('click', hideModal);
+
+            document.getElementById('save-password').addEventListener('click', ()=>{
+            const oldP = document.getElementById('pwd-old').value;
+            const p1 = document.getElementById('pwd-new').value;
+            const p2 = document.getElementById('pwd-new2').value;
+
+            if(!oldP || !p1 || !p2){
+                alert('请完整填写三项');
+                return;
+            }
+            if(p1.length < 8){
+                alert('新密码至少 8 位');
+                return;
+            }
+            if(p1 !== p2){
+                alert('两次输入的新密码不一致');
+                return;
+            }
+            // 演示：不做真实校验与保存
+            hideModal();
+            alert('密码已修改!');
+            });
+
+            // 点击头像菜单里的「我的任务」跳转到新页面
+            document.getElementById('u955').addEventListener('click', (e)=>{
+            e.stopPropagation();
+            userMenu.classList.remove('active');
+            window.location.href = '我的任务.html';
+            });
+
 
         });
     </script>
