@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 3Dmol.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.1.0/3Dmol-min.js"></script>
     <style>
         :root {
             --primary-color: #17a2b8;
@@ -171,7 +173,87 @@
         .btn-secondary { background-color: #6c757d; color: white; }
         .btn-secondary:hover { background-color: #5a6268; }
 
-        .output-actions { margin-top: 25px; display: flex; gap: 15px; }
+        .pdb-viewer-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+       
+        .viewer-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+        }
+
+        .control-options-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .control-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .btn-group {
+            display: flex;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .control-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            background-color: #fff;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .btn-group .control-btn:last-child {
+            border-right: none;
+        }
+        .control-btn:hover {
+            background-color: #e9ecef;
+        }
+        .control-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .download-btn-style {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .download-btn-style:hover {
+            background-color: #138496;
+        }
+
     </style>
 </head>
 <body>
@@ -221,11 +303,41 @@
                 </section>
                 
                 <section class="content-card" id="output-section" style="display: none;">
-                     <h2>结果预览</h2>
-                     <p>结构补齐完成！您可以下载补齐后的PDB文件，并在本地使用Pymol等专业软件进行三维结构查看与分析。</p>
-                     <div class="output-actions">
-                        <button class="btn btn-primary text-sm px-4 py-2" id="download-btn">下载结果 (.pdb)</button>
-                     </div>
+                    <h2>结果预览</h2>
+                    <p>结构补齐完成！您可以在下方直观对比补齐前后的结构变化，或下载完整PDB文件。</p>
+                    
+                    <div class="viewer-controls">
+                        <div class="control-options-wrapper">
+                            <div class="control-group">
+                                <label>样式:</label>
+                                <div class="btn-group">
+                                    <button id="style-cartoon-btn" class="control-btn active" onclick="setStyle('cartoon')">飘带</button>
+                                    <button id="style-sphere-btn" class="control-btn" onclick="setStyle('sphere')">球</button>
+                                    <button id="style-stick-btn" class="control-btn" onclick="setStyle('stick')">棍</button>
+                                    <button id="style-line-btn" class="control-btn" onclick="setStyle('line')">线</button>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>颜色:</label>
+                                <div class="btn-group">
+                                    <button id="color-spectrum-btn" class="control-btn active" onclick="setColor('spectrum')">彩虹</button>
+                                    <button id="color-chain-btn" class="control-btn" onclick="setColor('chain')">链</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="download-btn-style" id="download-btn">下载补齐后结构 (.pdb)</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h3 class="text-center font-semibold mb-2 text-gray-700">补齐前</h3>
+                            <div id="pdb-viewer-before" class="pdb-viewer-container"></div>
+                        </div>
+                        <div>
+                            <h3 class="text-center font-semibold mb-2 text-gray-700">补齐后</h3>
+                            <div id="pdb-viewer-after" class="pdb-viewer-container"></div>
+                        </div>
+                    </div>
                 </section>
             </div>
 
@@ -236,7 +348,6 @@
                             <button class="tab-link active" onclick="openDetailTab(event, 'intro-content')">能力介绍</button>
                             <button class="tab-link" onclick="openDetailTab(event, 'example-content')">使用示例</button>
                         </nav>
-
                         
                         <div id="intro-content" class="detail-tab-content active">
                             <h2>能力介绍</h2>
@@ -253,18 +364,17 @@
                             <p>下图展示了上传含缺失片段的PDB文件后，一键运行补齐并获得可下载结果的流程。点击图片可查看大图。</p>
                             <img src="images/功能详情页-蛋白质结构补齐/12.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
 
-                            <!-- 示例文件下载（新增） -->
-                            <div class="output-actions" style="margin-top:16px;">
+                            <div class="mt-4 flex flex-wrap gap-3">
                                 <a class="btn btn-primary text-sm px-4 py-2"
                                    href="files/功能详情页-蛋白质结构补齐/EOMT_without_activesite.pdb"
-                                   download="EOMT_without_activesite.pdb">
-                                   下载示例输入（PDB）
+                                   download="EOMT_without_activesite.pdb" onclick="return forceDownload(this);">
+                                   下载示例输入 (PDB)
                                 </a>
                               
                                 <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
                                    href="files/功能详情页-蛋白质结构补齐/EOMT_reconstruction.pdb"
-                                   download="EOMT_reconstruction.pdb">
-                                   下载示例输出（PDB）
+                                   download="EOMT_reconstruction.pdb" onclick="return forceDownload(this);">
+                                   下载示例输出 (PDB)
                                 </a>
                               </div>
 
@@ -273,10 +383,9 @@
                 </div>
             </div>
         </div>
-        <!-- 参考文献 (底部全宽) -->
         <section id="references-section" class="content-card mt-8">
             <h2>引用文献</h2>
-            <blockquote><p>当前阶段未纳入引用文献，待内容进一步完善后将补充相关支撑文献。 <a</a></p></blockquote>
+            <blockquote><p>当前阶段未纳入引用文献，待内容进一步完善后将补充相关支撑文献。</p></blockquote>
         </section>
 
     </div>
@@ -287,10 +396,15 @@
     </div>
 
     <script>
+        let viewerBefore = null;
+        let viewerAfter = null;
+        let beforePdbData = '';
+        let afterPdbData = '';
+        let viewerSettings = { style: 'cartoon', color: 'spectrum' };
+
         function forceDownload(el){
-            // 如果是本地 file:// 打开，很多浏览器会无视 download，建议用 http 方式访问
             if (location.protocol === 'file:') {
-                alert('建议用本地 HTTP 服务打开页面：例如运行  python -m http.server  后访问 http://localhost:8000');
+                alert('建议用本地 HTTP 服务打开页面才能正常下载文件：例如运行  python -m http.server  后访问 http://localhost:8000');
             }
             const url = el.href;
             const filename = el.getAttribute('download') || url.split('/').pop();
@@ -306,17 +420,14 @@
                 URL.revokeObjectURL(a.href);
                 a.remove();
             }).catch(()=>{
-                // 兜底退回普通跳转
                 window.location.href = url;
             });
-            return false; // 阻止默认跳转
-            }
+            return false;
+        }
 
         function openDetailTab(evt, tabName) {
-            const tabcontent = document.querySelectorAll("#details-section .detail-tab-content");
-            tabcontent.forEach(tab => tab.classList.remove('active'));
-            const tablinks = document.querySelectorAll("#details-section .tab-link");
-            tablinks.forEach(link => link.classList.remove('active'));
+            document.querySelectorAll("#details-section .detail-tab-content").forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll("#details-section .tab-link").forEach(link => link.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
             evt.currentTarget.classList.add('active');
         }
@@ -338,28 +449,110 @@
 
         const runBtn = document.getElementById('run-btn');
         const loader = document.getElementById('loader');
-        const mockPdbResult = `ATOM      1  N   MET A   1      27.289  34.685  27.289  1.00 20.00           N
-ATOM      2  CA  MET A   1      27.813  35.912  27.813  1.00 20.00           C
-... (此处省略大量PDB内容) ...
-ATOM   1234  OXT ILE A 150      50.123  12.456  33.987  1.00 25.00           O
-TER`;
 
         runBtn.addEventListener('click', () => {
+             if (!document.getElementById('pdb-input').value && fileUpload.files.length === 0) {
+                alert('请输入或上传PDB结构！');
+                return;
+            }
+            
+            if (location.protocol === 'file:') {
+                alert('在线3D预览功能无法在本地file://协议下运行。请使用一个本地HTTP服务器来访问此页面（例如在终端中进入文件所在目录，运行 `python -m http.server` 命令，然后访问 http://localhost:8000 ）。');
+                return;
+            }
+
             loader.style.display = 'block';
             runBtn.disabled = true;
             clearBtn.disabled = true;
+
             setTimeout(() => {
-                loader.style.display = 'none';
-                runBtn.disabled = false;
-                clearBtn.disabled = false;
-                outputSection.style.display = 'block';
-                outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const fetchBefore = fetch('files/功能详情页-蛋白质结构补齐/EOMT_without_activesite.pdb').then(res => res.text());
+                const fetchAfter = fetch('files/功能详情页-蛋白质结构补齐/EOMT_reconstruction.pdb').then(res => res.text());
+
+                Promise.all([fetchBefore, fetchAfter])
+                    .then(([beforeData, afterData]) => {
+                        beforePdbData = beforeData;
+                        afterPdbData = afterData;
+                        initViewers(beforePdbData, afterPdbData);
+                        
+                        loader.style.display = 'none';
+                        runBtn.disabled = false;
+                        clearBtn.disabled = false;
+                        outputSection.style.display = 'block';
+                        outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    })
+                    .catch(error => {
+                        console.error('Error loading PDB files:', error);
+                        alert('加载PDB文件失败！');
+                        loader.style.display = 'none';
+                        runBtn.disabled = false;
+                        clearBtn.disabled = false;
+                    });
             }, 2000);
         });
 
+        function initViewers(beforeData, afterData) {
+            let viewerContainerBefore = document.getElementById('pdb-viewer-before');
+            viewerContainerBefore.innerHTML = ''; 
+            viewerBefore = $3Dmol.createViewer(viewerContainerBefore);
+            viewerBefore.addModel(beforeData, "pdb");
+
+            let viewerContainerAfter = document.getElementById('pdb-viewer-after');
+            viewerContainerAfter.innerHTML = '';
+            viewerAfter = $3Dmol.createViewer(viewerContainerAfter);
+            viewerAfter.addModel(afterData, "pdb");
+
+            applyViewerStyle();
+            
+            viewerBefore.zoomTo();
+            viewerBefore.render();
+            viewerAfter.zoomTo();
+            viewerAfter.render();
+
+            updateControlButtons();
+        }
+        
+        function applyViewerStyle() {
+            const viewers = [viewerBefore, viewerAfter].filter(v => v); // Filter out null viewers
+            if (viewers.length === 0) return;
+            
+            let styleSpec = {};
+            if (viewerSettings.color === 'spectrum') {
+                styleSpec[viewerSettings.style] = { color: 'spectrum' };
+            } else {
+                styleSpec[viewerSettings.style] = { colorscheme: viewerSettings.color };
+            }
+
+            viewers.forEach(viewer => {
+                viewer.setStyle({}, styleSpec);
+                viewer.render();
+            });
+        }
+
+        function setStyle(style) {
+            viewerSettings.style = style;
+            applyViewerStyle();
+            updateControlButtons();
+        }
+
+        function setColor(color) {
+            viewerSettings.color = color;
+            applyViewerStyle();
+            updateControlButtons();
+        }
+        
+        function updateControlButtons() {
+            document.querySelectorAll('.viewer-controls .control-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`style-${viewerSettings.style}-btn`).classList.add('active');
+            document.getElementById(`color-${viewerSettings.color}-btn`).classList.add('active');
+        }
+
         document.getElementById('download-btn').addEventListener('click', () => {
-            const pdbContent = mockPdbResult;
-            const blob = new Blob([pdbContent], { type: 'text/plain;charset=utf-8' });
+            if (!afterPdbData) {
+                alert('没有可下载的PDB数据！');
+                return;
+            }
+            const blob = new Blob([afterPdbData], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
