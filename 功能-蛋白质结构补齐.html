@@ -393,11 +393,11 @@
             return resis;
         }
 
-        runBtn.addEventListener('click', () => {
-             if (!document.getElementById('pdb-input').value && fileUpload.files.length === 0) {
-                alert('请输入或上传PDB结构！');
-                return;
-            }
+        // runBtn.addEventListener('click', () => {
+        //      if (!document.getElementById('pdb-input').value && fileUpload.files.length === 0) {
+        //         alert('请输入或上传PDB结构！');
+        //         return;
+        //     }
             
             if (location.protocol === 'file:') {
                 alert('在线3D预览功能无法在本地file://协议下运行。请使用一个本地HTTP服务器来访问此页面（例如在终端中进入文件所在目录，运行 `python -m http.server` 命令，然后访问 http://localhost:8000 ）。');
@@ -513,5 +513,6 @@
     </script>
 </body>
 </html>
+
 
 
