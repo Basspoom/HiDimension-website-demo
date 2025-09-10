@@ -267,7 +267,57 @@
                                 <label><input type="radio" name="chassis-cell" value="E.coli"> E.coli</label>
                             </div>
                         </div>
-                         <div class="form-group">
+
+                        <br>
+                        <div class="form-group">
+                            <label class="form-label">2. 选择生成策略</label>
+                            <div class="param-option-group">
+                                <label><input type="radio" name="decoding-method" value="greedy" checked onchange="updateParamsView()"> 贪婪搜索 (Greedy)</label>
+                                <label><input type="radio" name="decoding-method" value="beam" onchange="updateParamsView()"> 波束搜索 (Beam)</label>
+                                <label><input type="radio" name="decoding-method" value="temperature" onchange="updateParamsView()"> 温度采样 (Sample)</label>
+                            </div>
+                        </div>
+                
+                        <!-- Greedy Search Params -->
+                        <div id="greedy-params" class="param-section">
+                            <p class="text-sm text-gray-600">每一步贪婪选择当前概率最高的氨基酸，是模型压缩知识的局部最优。<strong>只能返回一条结果。</strong></p>
+                        </div>
+                
+                        <!-- Beam Search Params -->
+                        <div id="beam-search-params" class="param-section" style="display: none;">
+                            <p class="text-sm text-gray-600 mb-4">同时保留 N 条最优候选路径（即束宽），探索更广的搜索空间，结果更接近全局最优。</p>
+                            <div class="form-group">
+                                <label for="beam-width" class="form-label">束宽 (Beam Width)</label>
+                                <select id="beam-width" class="form-select">
+                                    <option value="5">5</option>
+                                    <option value="10" selected>10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="return-count-beam" class="form-label">返回条数</label>
+                                <input type="number" id="return-count-beam" class="form-input" min="1" max="10" value="5">
+                                 <p class="text-xs text-gray-500 mt-1">返回条数不能超过束宽。</p>
+                            </div>
+                        </div>
+                
+                        <!-- Temperature Sampling Params -->
+                        <div id="temperature-params" class="param-section" style="display: none;">
+                            <p class="text-sm text-gray-600 mb-4">按概率分布进行随机采样，并通过“温度因子T”控制随机程度，能够生成更多样化的序列。</p>
+                            <div class="form-group">
+                                <label for="temperature-scaling" class="form-label">温度 (Temperature)</label>
+                                <input type="number" id="temperature-scaling" class="form-input" min="0" max="2.0" step="0.1" value="0.0" placeholder="输入 0 ~ 2.0 之间的小数">
+                                <p class="text-xs text-gray-500 mt-1">T=0 等效于贪婪搜索。T越大，随机性越强，多样性越高。</p>
+                            </div>
+                             <div class="form-group">
+                                <label for="return-count-temp" class="form-label">返回条数</label>
+                                <input type="number" id="return-count-temp" class="form-input" min="1" max="50" value="5">
+                            </div>
+                        </div>
+
+
+                         <!-- <div class="form-group">
                             <label class="form-label">2. 选择生成策略</label>
                             <div class="param-option-group">
                                 <label><input type="radio" name="generation-strategy" value="greedy" checked onchange="toggleBeamWidth()"> 贪婪解码</label>
@@ -283,7 +333,10 @@
                                     <option value="50">50</option>
                                 </select>
                             </div>
-                        </div>
+                        </div> -->
+
+
+                        <br><br>
                          <div class="form-group">
                             <label class="form-label">3. 勾选要屏蔽的酶切位点</label>
                             <div class="enzyme-grid">
@@ -303,10 +356,22 @@
                                 <label><input type="checkbox" name="enzyme" value="Xho-I"> Xho-I</label>
                             </div>
                         </div>
-                         <div class="form-group">
+
+
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <h3 class="text-lg font-semibold mb-2">策略对比</h3>
+                            <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                                <strong>质量:</strong> 波束搜索 > 贪婪搜索 > 温度采样<br>
+                                <strong>速度:</strong> 贪婪搜索 > 温度采样 ≈ 波束搜索<br>
+                                <strong>多样性:</strong> 温度采样 >> 波束搜索 ≈ 贪婪搜索 = 0
+                            </p>
+                            <img src="images/功能详情页-蛋白质序列设计/111.png" alt="参数对比图" class="w-full h-auto rounded-lg border">
+                       </div>
+
+                         <!-- <div class="form-group">
                             <label for="return-count" class="form-label">4. 设返回条数</label>
                             <input type="number" id="return-count" class="form-input" min="1" max="20" value="5">
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="action-buttons">
@@ -413,25 +478,53 @@
             return false; // 阻止默认跳转
             }
 
+        // Tab 切换 (输入/参数)
         function openTab(evt, tabName) {
-            document.querySelectorAll("#input-parameters-section .tab-content").forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll("#input-parameters-section .tab-link").forEach(link => link.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            evt.currentTarget.classList.add('active');
+            const tabcontent = document.querySelectorAll("#input-parameters-section .tab-content");
+            tabcontent.forEach(tab => tab.style.display = "none");
+            const tablinks = document.querySelectorAll("#input-parameters-section .tab-link");
+            tablinks.forEach(link => link.className = link.className.replace(" active", ""));
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
         }
 
+        // Tab 切换 (详情/示例)
         function openDetailTab(evt, tabName) {
-            document.querySelectorAll("#details-section .detail-tab-content").forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll("#details-section .tab-link").forEach(link => link.classList.remove('active'));
+            const tabcontent = document.querySelectorAll("#details-section .detail-tab-content");
+            tabcontent.forEach(tab => tab.classList.remove('active'));
+            const tablinks = document.querySelectorAll("#details-section .tab-link");
+            tablinks.forEach(link => link.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
             evt.currentTarget.classList.add('active');
         }
 
-        function toggleBeamWidth() {
-            const strategy = document.querySelector('input[name="generation-strategy"]:checked').value;
-            const beamWidthContainer = document.getElementById('beam-width-container');
-            beamWidthContainer.style.display = strategy === 'beam' ? 'block' : 'none';
+        // 切换解码参数的显示
+        function updateParamsView() {
+            const selectedMethod = document.querySelector('input[name="decoding-method"]:checked').value;
+            document.getElementById('greedy-params').style.display = 'none';
+            document.getElementById('beam-search-params').style.display = 'none';
+            document.getElementById('temperature-params').style.display = 'none';
+
+            if (selectedMethod === 'greedy') {
+                document.getElementById('greedy-params').style.display = 'block';
+            } else if (selectedMethod === 'beam') {
+                document.getElementById('beam-search-params').style.display = 'block';
+            } else if (selectedMethod === 'temperature') {
+                document.getElementById('temperature-params').style.display = 'block';
+            }
         }
+        
+        // 约束波束搜索的返回条数
+        const beamWidthSelect = document.getElementById('beam-width');
+        const beamReturnCountInput = document.getElementById('return-count-beam');
+        beamWidthSelect.addEventListener('change', () => {
+            const maxWidth = parseInt(beamWidthSelect.value, 10);
+            beamReturnCountInput.max = maxWidth;
+            if (parseInt(beamReturnCountInput.value, 10) > maxWidth) {
+                beamReturnCountInput.value = maxWidth;
+            }
+        });
+
 
         const fileUpload = document.getElementById('file-upload');
         const fileNameSpan = document.getElementById('file-name');
