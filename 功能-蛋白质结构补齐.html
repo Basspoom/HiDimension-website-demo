@@ -9,7 +9,7 @@
  	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
  	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet"> 
  	<script src="https://cdn.tailwindcss.com"></script> 
- 	<script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.1.0/3Dmol-min.js"></script>
+ 	<script src="https://cdn.jsdelivr.net/npm/ngl@2.0.0-dev.38/dist/ngl.js"></script> 
  	<style> 
  		:root { 
  			--primary-color: #17a2b8; 
@@ -334,7 +334,6 @@
  TER`; 
  		
  		let viewersInitialized = false;
- 		let viewer_before, viewer_after;
 
  		runBtn.addEventListener('click', () => { 
  			loader.style.display = 'block'; 
@@ -353,7 +352,7 @@
  			}, 2000); 
  		}); 
  		
- 		// --- 3Dmol.js Visualization Logic ---
+ 		// --- NGL Viewer Visualization Logic ---
  		function getResidueSetFromText(pdbText) {
  			const lines = pdbText.split('\n');
  			const resiSet = new Set();
@@ -375,8 +374,15 @@
  			afterContainer.innerHTML = ''; // Clear any previous content
 
  			try {
- 				viewer_before = $3Dmol.createViewer(beforeContainer, { backgroundColor: 'white' });
- 				viewer_after = $3Dmol.createViewer(afterContainer, { backgroundColor: 'white' });
+                // --- Create NGL Stages ---
+ 				const stageBefore = new NGL.Stage(beforeContainer);
+                const stageAfter = new NGL.Stage(afterContainer);
+                
+                // Handle window resizing
+                window.addEventListener("resize", function () {
+                    stageBefore.handleResize();
+                    stageAfter.handleResize();
+                }, false);
 
  				const [pdbBeforeRes, pdbAfterRes] = await Promise.all([
  					fetch('files/功能详情页-蛋白质结构补齐/EOMT_without_activesite.pdb'),
@@ -390,11 +396,15 @@
  				const pdbBeforeText = await pdbBeforeRes.text();
  				const pdbAfterText = await pdbAfterRes.text();
 
+                const beforeBlob = new Blob([pdbBeforeText], { type: 'text/plain' });
+                const afterBlob = new Blob([pdbAfterText], { type: 'text/plain' });
+
  				// --- Render "Before" structure ---
- 				viewer_before.addModel(pdbBeforeText, 'pdb');
- 				viewer_before.setStyle({}, { cartoon: { style: 'trace', color: '#80d0ff' } });
- 				viewer_before.zoomTo();
- 				viewer_before.render();
+ 				stageBefore.loadFile(beforeBlob, { ext: "pdb" }).then(function (component) {
+                    component.addRepresentation("cartoon", { color: "#80d0ff" });
+                    component.autoView();
+                });
+
 
  				// --- Render "After" structure with differential coloring ---
  				const originalResiSet = getResidueSetFromText(pdbBeforeText);
@@ -407,20 +417,25 @@
  					}
  				});
  				
- 				viewer_after.addModel(pdbAfterText, 'pdb');
- 				viewer_after.setStyle({}, { cartoon: { style: 'trace', color: '#80d0ff' } });
- 				if (newResidues.length > 0) {
- 					viewer_after.addStyle({ resi: newResidues }, { cartoon: { style: 'trace', color: 'red' } });
- 				}
- 				viewer_after.zoomTo();
- 				viewer_after.render();
+                const newResiduesSelection = newResidues.join(" or ");
+
+ 				stageAfter.loadFile(afterBlob, { ext: "pdb" }).then(function (component) {
+                    // Original part in blue
+                    component.addRepresentation("cartoon", { color: "#80d0ff" });
+                    // New part in red
+                    if(newResiduesSelection) {
+                         component.addRepresentation("cartoon", { color: "red", sele: newResiduesSelection });
+                    }
+                    component.autoView();
+                });
 
  				// --- Sync cameras ---
- 				viewer_before.setSync(viewer_after);
- 				viewer_after.setSync(viewer_before);
+ 				stageBefore.viewerControls.sync(stageAfter.viewerControls);
+                stageAfter.viewerControls.sync(stageBefore.viewerControls);
+
 
  			} catch (error) {
- 				console.error("Error setting up 3D viewers:", error);
+ 				console.error("Error setting up NGL viewers:", error);
  				beforeContainer.innerHTML = `<div class="p-4 text-red-600">无法加载示例PDB文件: ${error.message}</div>`;
  				afterContainer.innerHTML = `<div class="p-4 text-red-600">无法加载示例PDB文件: ${error.message}</div>`;
  			}
@@ -460,5 +475,4 @@
  	</script> 
  </body> 
  </html>
-
 
