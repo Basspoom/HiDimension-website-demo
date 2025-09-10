@@ -126,8 +126,8 @@
             border-bottom-color: var(--primary-color);
         }
         
-        .tab-content, .detail-tab-content { display: none; }
-        .tab-content.active, .detail-tab-content.active { display: block; animation: fadeIn 0.5s; }
+        .tab-content, .detail-tab-content, .output-tab-content { display: none; }
+        .tab-content.active, .detail-tab-content.active, .output-tab-content.active { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -191,6 +191,60 @@
             font-size: 14px;
             line-height: 1.6;
         }
+        
+        /* --- 比对样式优化 --- */
+        .alignment-view {
+            background-color: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+        .alignment-block:not(:last-child) {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        .alignment-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+        .alignment-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+        }
+        .alignment-table td {
+            padding: 2px 0;
+            vertical-align: middle;
+        }
+        .alignment-table .label-col {
+            width: 50px;
+            font-weight: bold;
+            color: var(--subtle-text-color);
+            padding-right: 10px;
+        }
+        .alignment-table .seq-col {
+            letter-spacing: 0.2em; /* Increase spacing for clarity */
+            white-space: pre;
+        }
+        .mutated {
+            background-color: #fecaca; /* red-200 */
+            color: #b91c1c; /* red-700 */
+            font-weight: bold;
+            border-radius: 3px;
+        }
+        .unchanged {
+            color: #374151; /* gray-700, more readable */
+        }
+        .ruler-line {
+            color: var(--subtle-text-color);
+        }
+
     </style>
 </head>
 <body>
@@ -276,14 +330,29 @@
                 </section>
                 
                 <section class="content-card" id="output-section" style="display: none;">
-                     <h2>结果预览</h2>
-                     <p>优化完成！您可以在下方查看优化后的氨基酸序列，并下载FASTA格式的完整文件。</p>
-                     <div class="output-actions">
-                        <button class="btn btn-primary text-sm px-4 py-2" id="download-btn">下载结果 (.fasta)</button>
-                     </div>
-                      <div class="output-wrapper mt-4">
-                        <pre id="output-fasta"></pre>
-                     </div>
+                    <h2>结果预览</h2>
+                    <p>优化已完成。下方展示优化后的氨基酸序列，可在比对视图中快速定位突变/固定位点。</p>
+                    <p class="text-sm bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-3 rounded-md my-4"><strong>提示：</strong>提高热稳定性可能伴随蛋白质活性下降。请在比对视图中重点核查催化残基、配位或结合位点等关键氨基酸，剔除涉及关键位点的候选序列。</p>
+                    
+                    <nav class="tabs mt-4">
+                        <button class="tab-link active" onclick="openOutputTab(event, 'alignment-view-tab')">突变比对</button>
+                        <button class="tab-link" onclick="openOutputTab(event, 'fasta-output-tab')">FASTA序列</button>
+                    </nav>
+
+                    <div id="alignment-view-tab" class="output-tab-content active">
+                        <div id="alignment-view" class="alignment-view">
+                            <!-- JS动态生成比对结果 -->
+                        </div>
+                    </div>
+
+                    <div id="fasta-output-tab" class="output-tab-content">
+                        <div class="output-actions">
+                           <button class="btn btn-primary text-sm px-4 py-2" id="download-btn">下载结果 (.fasta)</button>
+                        </div>
+                        <div class="output-wrapper mt-4">
+                           <pre id="output-fasta"></pre>
+                        </div>
+                    </div>
                 </section>
             </div>
 
@@ -310,59 +379,27 @@
                             <h2>使用示例</h2>
                             <p>下图展示了输入PDB和FASTA文件，并设置参数后，一键运行优化并获得可下载结果的流程。点击图片可查看大图。</p>
                             <img src="images/功能详情页-蛋白质热稳定性优化/14.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
-
-                            <!-- 示例文件下载（新增） -->
-                            <!-- <div class="output-actions" style="margin-top:16px;">
-                                <a class="btn btn-primary text-sm px-4 py-2"
-                                   href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.fasta"
-                                   download="t4rnl2.fasta">
-                                   下载示例输入（FASTA）
-                                </a>
-                                <div class="output-actions" style="margin-top:16px;">
-                                    <a class="btn btn-primary text-sm px-4 py-2"
-                                       href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.pdb"
-                                       download="t4rnl2.pdb">
-                                       下载示例输入（PDB）
-                                    </a>                              
-                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
-                                   href="files/功能详情页-蛋白质热稳定性优化/optimized_example_Tm.fasta"
-                                   download="optimized_example_Tm.fasta">
-                                   下载示例输出（FASTA） -->
-                            <section class="content-card">
-                            <h2>示例文件下载</h2>
+                            
+                            <h2 class="mt-6">示例文件下载</h2>
                             <div class="flex flex-wrap items-center gap-3 mt-2">
-                                <a class="btn btn-primary text-sm px-4 py-2"
-                                    href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.fasta"
-                                    download="t4rnl2.fasta">
-                                下载示例输入（FASTA）
+                                <a class="btn btn-primary text-sm px-4 py-2" href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.fasta" download="t4rnl2.fasta">
+                                下载示例输入 (FASTA)
                                 </a>
-                            
-                                <span class="hidden sm:inline-block w-px h-6 bg-gray-200"></span>
-                            
-                                <a class="btn btn-primary text-sm px-4 py-2"
-                                    href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.pdb"
-                                    download="t4rnl2.pdb">
-                                下载示例输入（PDB）
+                                <a class="btn btn-primary text-sm px-4 py-2" href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.pdb" download="t4rnl2.pdb">
+                                下载示例输入 (PDB)
                                 </a>
-                            
-                                <span class="hidden sm:inline-block w-px h-6 bg-gray-200"></span>
-                            
-                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
-                                    href="files/功能详情页-蛋白质热稳定性优化/optimized_example_Tm.fasta"
-                                    download="optimized_example_Tm.fasta">
-                                下载示例输出（FASTA）
+                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600" href="files/功能详情页-蛋白质热稳定性优化/optimized_example_Tm.fasta" download="optimized_example_Tm.fasta">
+                                下载示例输出 (FASTA)
                                 </a>
-
                             </div>
                         </div>
                     </section>
                 </div>
             </div>
         </div>
-        <!-- 参考文献 (底部全宽) -->
         <section id="references-section" class="content-card mt-8">
             <h2>引用文献</h2>
-            <blockquote><p>当前阶段未纳入引用文献，待内容进一步完善后将补充相关支撑文献。 <a</a></p></blockquote>
+            <blockquote><p>当前阶段未纳入引用文献，待内容进一步完善后将补充相关支撑文献。</p></blockquote>
         </section>
 
     </div>
@@ -373,32 +410,6 @@
     </div>
 
     <script>
-        function forceDownload(el){
-            // 如果是本地 file:// 打开，很多浏览器会无视 download，建议用 http 方式访问
-            if (location.protocol === 'file:') {
-                alert('建议用本地 HTTP 服务打开页面：例如运行  python -m http.server  后访问 http://localhost:8000');
-            }
-            const url = el.href;
-            const filename = el.getAttribute('download') || url.split('/').pop();
-            fetch(url).then(r => {
-                if (!r.ok) throw new Error('fetch failed');
-                return r.blob();
-            }).then(blob => {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                URL.revokeObjectURL(a.href);
-                a.remove();
-            }).catch(()=>{
-                // 兜底退回普通跳转
-                window.location.href = url;
-            });
-            return false; // 阻止默认跳转
-            }
-
-
         function openTab(evt, tabName) {
             document.querySelectorAll("#input-parameters-section .tab-content").forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll("#input-parameters-section .tab-link").forEach(link => link.classList.remove('active'));
@@ -412,6 +423,14 @@
             document.getElementById(tabName).classList.add('active');
             evt.currentTarget.classList.add('active');
         }
+        
+        function openOutputTab(evt, tabName) {
+            document.querySelectorAll("#output-section .output-tab-content").forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll("#output-section .tab-link").forEach(link => link.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
 
         function toggleModeInputs() {
             const mode = document.querySelector('input[name="optimization-mode"]:checked').value;
@@ -451,26 +470,136 @@
         const runBtn = document.getElementById('run-btn');
         const loader = document.getElementById('loader');
         const outputFasta = document.getElementById('output-fasta');
-        const mockFastaResult = `>optimized_sample_1
-ASKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTL
-VTTFSYGVQCFSRYPDHMKRHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLV
-NRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLAD
-HYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK
->optimized_sample_2
-MAKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTL
-VTTFSYGVQCFSRYPDHMKRHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLV
-NRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLAD
-HYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK`;
+        const alignmentView = document.getElementById('alignment-view');
+        
+        const mockFastaResult = `>optimized_example_Tm
+MFKKYSSLENHYNSKFIEKLYSLGLTKGEWVAREKIHGTNFSLIIERDKVTCAKRTGPIL
+PAEDFFGYEIILKNYADSIKAVQDIMETSAVVSYQVFGEFAGPGIQKNVDYCDKDFYVFD
+IIVTTESGDVTYVDDHMMESFCNTFKFKMAPLLGRGKFEELIKLPNGLDSVVQDYNFTVD
+HAGQVDANKCVWNAEAKGEVFTAKGYVLKPCYPSWLRNGNRVAIKCKNSKFSEKKKSDKP
+IKAKVYLSEADNKLVGILACYVTLNRVNNVISKIGEIGPKDFGKVMGLTVQDILEETSRE
+GITLTQADNPSLIKKELVKMVQDVLRPAWIELVS`;
+
+        function parseFasta(fastaString) {
+            const sequences = [];
+            const lines = fastaString.trim().split('\n');
+            let currentHeader = '';
+            let currentSequence = '';
+
+            for (const line of lines) {
+                if (line.startsWith('>')) {
+                    if (currentHeader) {
+                        sequences.push({ header: currentHeader, sequence: currentSequence.replace(/\s/g, '') });
+                    }
+                    currentHeader = line.substring(1);
+                    currentSequence = '';
+                } else {
+                    currentSequence += line.trim();
+                }
+            }
+            if (currentHeader) {
+                sequences.push({ header: currentHeader, sequence: currentSequence.replace(/\s/g, '') });
+            }
+            return sequences;
+        }
+        
+        function createAlignmentHTML(originalSeq, optimizedEntry) {
+            let html = `<div class="alignment-block">`;
+            html += `<div class="alignment-header">${optimizedEntry.header}</div>`;
+            html += `<table class="alignment-table">`;
+            
+            const chunkSize = 60;
+            
+            for (let i = 0; i < originalSeq.length; i += chunkSize) {
+                const startPos = i + 1;
+                
+                const originalChunk = originalSeq.substring(i, i + chunkSize);
+                const optimizedChunk = optimizedEntry.sequence.substring(i, i + chunkSize);
+                
+                let rulerLine = ' '.repeat(chunkSize);
+                let originalLine = '';
+                let optimizedLine = '';
+
+                for(let j=0; j < originalChunk.length; j++) {
+                    const originalChar = originalChunk[j];
+                    const optimizedChar = optimizedChunk[j];
+
+                    if (originalChar === optimizedChar) {
+                        originalLine += `<span class="unchanged">${originalChar}</span>`;
+                        optimizedLine += `<span class="unchanged">${optimizedChar}</span>`;
+                    } else {
+                        originalLine += `<span class="mutated">${originalChar}</span>`;
+                        optimizedLine += `<span class="mutated">${optimizedChar}</span>`;
+                    }
+                    
+                    const currentPos = i + j + 1;
+                    if (currentPos % 10 === 0) {
+                        const numStr = currentPos.toString();
+                        const startIdx = j - numStr.length + 1;
+                        if(startIdx >= 0) {
+                           rulerLine = rulerLine.substring(0, startIdx) + numStr + rulerLine.substring(j + 1);
+                        }
+                    } else if (currentPos % 5 === 0 && currentPos.toString().length === 1) { // Avoid overwriting numbers
+                        rulerLine = rulerLine.substring(0, j) + '.' + rulerLine.substring(j + 1);
+                    }
+                }
+                
+                html += `
+                    <tbody>
+                        <tr>
+                            <td class="label-col">${startPos}</td>
+                            <td class="seq-col ruler-line">${rulerLine}</td>
+                        </tr>
+                        <tr>
+                            <td class="label-col">Orig</td>
+                            <td class="seq-col">${originalLine}</td>
+                        </tr>
+                        <tr>
+                            <td class="label-col">Opti</td>
+                            <td class="seq-col">${optimizedLine}</td>
+                        </tr>
+                        <tr style="height: 1rem;"><td colspan="2"></td></tr>
+                    </tbody>
+                `;
+            }
+            
+            html += `</table></div>`;
+            return html;
+        }
+
 
         runBtn.addEventListener('click', () => {
+            const originalFastaInput = document.getElementById('fasta-input').value;
+            if (!originalFastaInput || !originalFastaInput.includes('>')) {
+                alert('请输入有效的FASTA格式原始序列！');
+                return;
+            }
+
             loader.style.display = 'block';
             runBtn.disabled = true;
             clearBtn.disabled = true;
+
             setTimeout(() => {
                 loader.style.display = 'none';
                 runBtn.disabled = false;
                 clearBtn.disabled = false;
+                
                 outputFasta.textContent = mockFastaResult;
+
+                const originalSequences = parseFasta(originalFastaInput);
+                const optimizedSequences = parseFasta(mockFastaResult);
+                
+                if (originalSequences.length > 0 && optimizedSequences.length > 0) {
+                    const originalSeq = originalSequences[0].sequence;
+                    let alignmentHTML = '';
+                    optimizedSequences.forEach(optSeq => {
+                         if (originalSeq.length === optSeq.sequence.length) {
+                             alignmentHTML += createAlignmentHTML(originalSeq, optSeq);
+                         }
+                    });
+                    alignmentView.innerHTML = alignmentHTML;
+                }
+                
                 document.getElementById('output-section').style.display = 'block';
                 document.getElementById('output-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 2000);
@@ -507,10 +636,10 @@ HYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK`;
             if (e.target === modal) { closeImageModal(); }
         });
         
-        // Initialize parameter states
         document.addEventListener('DOMContentLoaded', () => {
             toggleModeInputs();
         });
     </script>
 </body>
 </html>
+
