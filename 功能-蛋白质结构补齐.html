@@ -304,8 +304,9 @@
                 
                 <section class="content-card" id="output-section" style="display: none;">
                     <h2>结果预览</h2>
-                    <p>结构补齐完成！您可以在下方直观对比补齐前后的结构变化，或下载完整PDB文件。</p>
-                    
+                    <p>结构补齐完成！您可以在下方直观对比补齐前后的结构变化（<span class="font-bold text-red-600">红色高亮</span>为新补齐部分），或下载完整PDB文件。</p>
+
+                    <br>
                     <div class="viewer-controls">
                         <div class="control-options-wrapper">
                             <div class="control-group">
@@ -400,6 +401,7 @@
         let viewerAfter = null;
         let beforePdbData = '';
         let afterPdbData = '';
+        let newResidueIds = [];
         let viewerSettings = { style: 'cartoon', color: 'spectrum' };
 
         function forceDownload(el){
@@ -450,6 +452,17 @@
         const runBtn = document.getElementById('run-btn');
         const loader = document.getElementById('loader');
 
+        function getResidueIds(pdbData) {
+            const resis = new Set();
+            if (!pdbData) return resis;
+            pdbData.split('\n').forEach(line => {
+                if (line.startsWith('ATOM')) {
+                    resis.add(parseInt(line.substring(22, 26).trim()));
+                }
+            });
+            return resis;
+        }
+
         runBtn.addEventListener('click', () => {
              if (!document.getElementById('pdb-input').value && fileUpload.files.length === 0) {
                 alert('请输入或上传PDB结构！');
@@ -473,6 +486,11 @@
                     .then(([beforeData, afterData]) => {
                         beforePdbData = beforeData;
                         afterPdbData = afterData;
+
+                        const beforeResis = getResidueIds(beforePdbData);
+                        const afterResis = getResidueIds(afterPdbData);
+                        newResidueIds = [...afterResis].filter(r => !beforeResis.has(r));
+                        
                         initViewers(beforePdbData, afterPdbData);
                         
                         loader.style.display = 'none';
@@ -502,19 +520,23 @@
             viewerAfter = $3Dmol.createViewer(viewerContainerAfter);
             viewerAfter.addModel(afterData, "pdb");
 
+            // Link camera events
+            viewerBefore.setSychronizeViewer(viewerAfter);
+            viewerAfter.setSychronizeViewer(viewerBefore);
+
             applyViewerStyle();
             
             viewerBefore.zoomTo();
-            viewerBefore.render();
             viewerAfter.zoomTo();
+            viewerBefore.render();
             viewerAfter.render();
+
 
             updateControlButtons();
         }
         
         function applyViewerStyle() {
-            const viewers = [viewerBefore, viewerAfter].filter(v => v); // Filter out null viewers
-            if (viewers.length === 0) return;
+            if (!viewerBefore || !viewerAfter) return;
             
             let styleSpec = {};
             if (viewerSettings.color === 'spectrum') {
@@ -523,10 +545,16 @@
                 styleSpec[viewerSettings.style] = { colorscheme: viewerSettings.color };
             }
 
-            viewers.forEach(viewer => {
-                viewer.setStyle({}, styleSpec);
-                viewer.render();
-            });
+            // Apply base style to "before" viewer
+            viewerBefore.setStyle({}, styleSpec);
+            viewerBefore.render();
+
+            // Apply base style to "after" viewer, then highlight new residues
+            viewerAfter.setStyle({}, styleSpec);
+            if (newResidueIds.length > 0) {
+                 viewerAfter.setStyle({resi: newResidueIds}, {stick: {color: 'red'}});
+            }
+            viewerAfter.render();
         }
 
         function setStyle(style) {
@@ -583,3 +611,4 @@
     </script>
 </body>
 </html>
+
