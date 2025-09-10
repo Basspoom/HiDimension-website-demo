@@ -181,64 +181,6 @@
             border-radius: 8px;
         }
        
-        .viewer-controls {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 1.25rem;
-        }
-
-        .control-options-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .control-group label {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-
-        .btn-group {
-            display: flex;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .control-btn {
-            padding: 6px 12px;
-            font-size: 14px;
-            background-color: #fff;
-            border: none;
-            border-right: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-        }
-        .btn-group .control-btn:last-child {
-            border-right: none;
-        }
-        .control-btn:hover {
-            background-color: #e9ecef;
-        }
-        .control-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
         .download-btn-style {
             background-color: var(--primary-color);
             color: white;
@@ -252,6 +194,13 @@
         }
         .download-btn-style:hover {
             background-color: #138496;
+        }
+        
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
         }
 
     </style>
@@ -303,28 +252,10 @@
                 </section>
                 
                 <section class="content-card" id="output-section" style="display: none;">
-                    <h2>结果预览</h2>
-                    <p>结构补齐完成！您可以在下方直观对比补齐前后的结构变化（<span class="font-bold text-red-600">红色高亮</span>为新补齐部分），或下载完整PDB文件。</p>
-
-                    <br>
-                    <div class="viewer-controls">
-                        <div class="control-options-wrapper">
-                            <div class="control-group">
-                                <label>样式:</label>
-                                <div class="btn-group">
-                                    <button id="style-cartoon-btn" class="control-btn active" onclick="setStyle('cartoon')">飘带</button>
-                                    <button id="style-sphere-btn" class="control-btn" onclick="setStyle('sphere')">球</button>
-                                    <button id="style-stick-btn" class="control-btn" onclick="setStyle('stick')">棍</button>
-                                    <button id="style-line-btn" class="control-btn" onclick="setStyle('line')">线</button>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <label>颜色:</label>
-                                <div class="btn-group">
-                                    <button id="color-spectrum-btn" class="control-btn active" onclick="setColor('spectrum')">彩虹</button>
-                                    <button id="color-chain-btn" class="control-btn" onclick="setColor('chain')">链</button>
-                                </div>
-                            </div>
+                    <div class="output-header">
+                        <div>
+                            <h2>结果预览</h2>
+                            <p class="text-sm text-gray-600 mt-1">补齐部分已用<span class="font-bold text-red-600">红色棍状模型</span>高亮显示。</p>
                         </div>
                         <button class="download-btn-style" id="download-btn">下载补齐后结构 (.pdb)</button>
                     </div>
@@ -402,7 +333,6 @@
         let beforePdbData = '';
         let afterPdbData = '';
         let newResidueIds = [];
-        let viewerSettings = { style: 'cartoon', color: 'spectrum' };
 
         function forceDownload(el){
             if (location.protocol === 'file:') {
@@ -524,55 +454,27 @@
             viewerBefore.setSychronizeViewer(viewerAfter);
             viewerAfter.setSychronizeViewer(viewerBefore);
 
-            applyViewerStyle();
+            applyFixedStyle();
             
             viewerBefore.zoomTo();
             viewerAfter.zoomTo();
-            viewerBefore.render();
-            viewerAfter.render();
-
-
-            updateControlButtons();
         }
         
-        function applyViewerStyle() {
+        function applyFixedStyle() {
             if (!viewerBefore || !viewerAfter) return;
             
-            let styleSpec = {};
-            if (viewerSettings.color === 'spectrum') {
-                styleSpec[viewerSettings.style] = { color: 'spectrum' };
-            } else {
-                styleSpec[viewerSettings.style] = { colorscheme: viewerSettings.color };
-            }
-
+            const baseStyle = { line: { color: '#CCCCCC' } }; // A nice light grey color
+            
             // Apply base style to "before" viewer
-            viewerBefore.setStyle({}, styleSpec);
+            viewerBefore.setStyle({}, baseStyle);
             viewerBefore.render();
 
             // Apply base style to "after" viewer, then highlight new residues
-            viewerAfter.setStyle({}, styleSpec);
+            viewerAfter.setStyle({}, baseStyle);
             if (newResidueIds.length > 0) {
-                 viewerAfter.setStyle({resi: newResidueIds}, {stick: {color: 'red'}});
+                 viewerAfter.addStyle({resi: newResidueIds}, {stick: {color: 'red'}});
             }
             viewerAfter.render();
-        }
-
-        function setStyle(style) {
-            viewerSettings.style = style;
-            applyViewerStyle();
-            updateControlButtons();
-        }
-
-        function setColor(color) {
-            viewerSettings.color = color;
-            applyViewerStyle();
-            updateControlButtons();
-        }
-        
-        function updateControlButtons() {
-            document.querySelectorAll('.viewer-controls .control-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`style-${viewerSettings.style}-btn`).classList.add('active');
-            document.getElementById(`color-${viewerSettings.color}-btn`).classList.add('active');
         }
 
         document.getElementById('download-btn').addEventListener('click', () => {
