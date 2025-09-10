@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>功能详情页 - 蛋白质结构预测</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 3Dmol.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.1.0/3Dmol-min.js"></script>
+    <style>
+        :root {
+            --primary-color: #17a2b8;
+            --background-color: #f4f7fa;
+            --card-background-color: #ffffff;
+            --text-color: #333;
+            --subtle-text-color: #6c757d;
+            --border-color: #dee2e6;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding-top: 80px;
+        }
+        
+        #header-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: var(--card-background-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-sizing: border-box;
+        }
+        
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-color);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .main-container {
+            max-width: 1440px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(244, 247, 250, 0.1));
+            border-radius: var(--border-radius);
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid #e0e8f0;
+        }
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0;
+        }
+        .page-header p {
+            font-size: 18px;
+            color: var(--subtle-text-color);
+            margin-top: 10px;
+            max-width: 80%;
+        }
+
+        .content-card {
+            background-color: var(--card-background-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+        }
+        .content-card h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+            display: inline-block;
+        }
+        .content-card p, .content-card ul {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+        }
+        .content-card strong {
+            color: var(--text-color);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        .tab-link {
+            padding: 12px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--subtle-text-color);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            transform: translateY(2px);
+        }
+        .tab-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab-content, .detail-tab-content { display: none; }
+        .tab-content.active, .detail-tab-content.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group { margin-bottom: 25px; }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-textarea {
+            min-height: 250px; 
+            resize: vertical; 
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
+        }
+        .upload-area { display: flex; align-items: center; gap: 15px; }
+        .upload-btn {
+            padding: 12px 20px; background-color: #e9ecef; color: #495057;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            cursor: pointer; font-weight: 600; transition: all 0.2s;
+        }
+        .upload-btn:hover { background-color: #d8dde2; }
+
+        .action-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 40px; }
+        .btn { padding: 15px 40px; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; border: none; transition: all 0.3s ease; }
+        .btn-primary { background-color: var(--primary-color); color: white; box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3); }
+        .btn-primary:hover { background-color: #138496; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4); }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; }
+
+        #pdb-viewer {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        .viewer-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .control-group label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .control-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .control-btn:hover {
+            background-color: #e9ecef;
+        }
+        .control-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header id="header-nav">
+        <a href="首页.html"><img src="images/首页/u108.png" alt="Logo" style="width: 240px; height: 60px;"></a>
+        <div class="header-title">蛋白质结构预测 - 功能详情</div>
+    </header>
+
+    <div class="main-container">
+        <div class="mb-6">
+            <a href="功能目录页.html" class="text-sm font-medium text-cyan-700 hover:text-cyan-900 transition-colors duration-200 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                回到功能目录
+            </a>
+        </div>
+        <header class="page-header">
+            <h1>蛋白质结构预测</h1>
+            <p>构建一个兼具高效性与高精度的蛋白质结构预测模型，推理速度比肩 AlphaFold3，平均推理速度小于1分钟/条。</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <div class="lg:col-span-7 flex flex-col gap-8">
+                <section class="content-card" id="input-parameters-section">
+                    <nav class="tabs">
+                        <button class="tab-link active" onclick="openTab(event, 'input-tab')">输入</button>
+                        <button class="tab-link" onclick="openTab(event, 'params-tab')">可选参数</button>
+                    </nav>
+
+                    <div id="input-tab" class="tab-content active">
+                        <div class="form-group">
+                            <label for="sequence-input" class="form-label">输入蛋白质氨基酸序列 (FASTA格式)</label>
+                            <textarea id="sequence-input" class="form-textarea" placeholder=">Protein_Sequence_1
+MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">或上传序列文件</label>
+                            <div class="upload-area">
+                                <button class="upload-btn" onclick="document.getElementById('file-upload').click();">选择文件</button>
+                                <span id="file-name">未选择任何文件</span>
+                                <input type="file" id="file-upload" accept=".fasta,.fa" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="params-tab" class="tab-content">
+                         <div class="form-group">
+                            <label for="recycle-step" class="form-label">迭代循环次数 (Recycle step)</label>
+                            <input type="number" id="recycle-step" class="form-input" min="1" max="20" value="4">
+                            <p class="text-sm text-gray-500 mt-2">迭代次数越多，运行时间越长，但结果精度通常更优。</p>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="run-btn">运行结构预测</button>
+                        <button class="btn btn-secondary" id="clear-btn">清空</button>
+                    </div>
+                    <div id="loader" class="text-center mt-4" style="display: none;">
+                        <svg class="animate-spin h-8 w-8 text-cyan-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <p class="mt-2 text-gray-600">正在预测结构，请稍候...</p>
+                    </div>
+                </section>
+                
+                <section class="content-card" id="output-section" style="display: none;">
+                    <h2>结果预览</h2>
+                    <p>结构预测完成！您可以在下方进行三维结构预览，或下载PDB文件用于本地分析。</p>
+                    
+                    <div class="viewer-controls">
+                        <div class="control-group">
+                            <label>样式:</label>
+                            <button id="style-cartoon-btn" class="control-btn active" onclick="setStyle('cartoon')">飘带</button>
+                            <button id="style-sphere-btn" class="control-btn" onclick="setStyle('sphere')">球</button>
+                            <button id="style-stick-btn" class="control-btn" onclick="setStyle('stick')">棍</button>
+                            <button id="style-line-btn" class="control-btn" onclick="setStyle('line')">线</button>
+                        </div>
+                        <div class="control-group">
+                            <label>颜色:</label>
+                            <button id="color-spectrum-btn" class="control-btn active" onclick="setColor('spectrum')">彩虹</button>
+                            <button id="color-chain-btn" class="control-btn" onclick="setColor('chain')">链</button>
+                        </div>
+                         <button class="btn btn-primary text-sm px-4 py-2" id="download-btn">下载结果 (.pdb)</button>
+                    </div>
+
+                    <div id="pdb-viewer"></div>
+                </section>
+            </div>
+
+            <div class="lg:col-span-5">
+                <div class="sticky top-28 flex flex-col gap-8">
+                    <section id="details-section" class="content-card">
+                        <nav class="tabs">
+                            <button class="tab-link active" onclick="openDetailTab(event, 'intro-content')">能力介绍</button>
+                            <button class="tab-link" onclick="openDetailTab(event, 'example-content')">使用示例</button>
+                        </nav>
+                        
+                        <div id="intro-content" class="detail-tab-content active">
+                            <h2>能力介绍</h2>
+                            <p>本任务旨在在基本保持预测精度的前提下，大幅提升蛋白质结构预测的效率。具体做法是利用蛋白质语言模型对序列进行解析，从而跳过传统的多序列比对（MSA）步骤，以显著降低推理开销。同时，将常用的序列比对模板搜索替换为基于嵌入的检索方法，使模型不仅运行更高效，也更容易搜索到远程同源蛋白质。</p>
+                            <ul class="list-disc list-inside mt-4 space-y-2">
+                                <li><strong>性能亮点:</strong> 性能达到 AlphaFold3 的 90%。速度为 AlphaFold3 的 10 余倍，平均推理速度 <1 分钟每条。</li>
+                                <li><strong>模型优势:</strong> 该功能基于我们自主研发的 <strong>BiooSeek0.5</strong> 进行搜索，替代 MSA，从而显著提升推理效率。</li>
+                                <li><strong>操作简便:</strong> 在本功能页中，用户只需要输入蛋白质氨基酸序列，即可调用 <strong>BiooFold1.0</strong> 进行结构预测，输出蛋白质结构文件 (.pdb)，并提供下载，便于用户进一步分析与应用。</li>
+                            </ul>
+                    </div>
+                        <div id="example-content" class="detail-tab-content">
+                            <h2>使用示例</h2>
+                            <p>下图展示了输入FASTA序列并设置参数后，一键运行预测并获得可下载结果的流程。点击图片可查看大图。</p>
+                            <img src="images/功能详情页-蛋白质结构预测/13.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
+
+                            <div class="mt-4 flex flex-wrap gap-3">
+                                <a class="btn btn-primary text-sm px-4 py-2"
+                                   href="files/功能详情页-蛋白质结构预测/9kpp_seq.fasta"
+                                   download="9kpp_seq.fasta" onclick="return forceDownload(this);">
+                                   下载示例输入 (FASTA)
+                                </a>
+                              
+                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
+                                   href="files/功能详情页-蛋白质结构预测/9kpp_pred.pdb"
+                                   download="9kpp_pred.pdb" onclick="return forceDownload(this);">
+                                   下载示例输出 (PDB)
+                                </a>
+                              </div>
+
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <section id="references-section" class="content-card mt-8">
+            <h2>引用文献</h2>
+            <blockquote><p>当前阶段未纳入引用文献，待内容进一步完善后将补充相关支撑文献。</p></blockquote>
+        </section>
+    </div>
+
+    <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 z-[2000] flex items-center justify-center p-4 hidden transition-opacity duration-300">
+        <span id="close-modal" class="absolute top-4 right-6 text-white text-5xl font-bold cursor-pointer hover:text-gray-300">&times;</span>
+        <img id="modal-image" src="" alt="放大的示例图片" class="max-w-full max-h-full rounded-lg shadow-2xl">
+    </div>
+
+    <script>
+        let viewerInstance = null;
+        let predictedPdbData = '';
+        let viewerSettings = { style: 'cartoon', color: 'spectrum' };
+
+        function forceDownload(el){
+            if (location.protocol === 'file:') {
+                alert('建议用本地 HTTP 服务打开页面才能正常下载文件：例如运行  python -m http.server  后访问 http://localhost:8000');
+            }
+            const url = el.href;
+            const filename = el.getAttribute('download') || url.split('/').pop();
+            fetch(url).then(r => {
+                if (!r.ok) throw new Error('fetch failed');
+                return r.blob();
+            }).then(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(a.href);
+                a.remove();
+            }).catch(()=>{
+                window.location.href = url;
+            });
+            return false;
+        }
+
+        function openTab(evt, tabName) {
+            document.querySelectorAll("#input-parameters-section .tab-content").forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll("#input-parameters-section .tab-link").forEach(link => link.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        function openDetailTab(evt, tabName) {
+            document.querySelectorAll("#details-section .detail-tab-content").forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll("#details-section .tab-link").forEach(link => link.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        const fileUpload = document.getElementById('file-upload');
+        const fileNameSpan = document.getElementById('file-name');
+        fileUpload.addEventListener('change', () => { 
+            fileNameSpan.textContent = fileUpload.files.length > 0 ? fileUpload.files[0].name : '未选择任何文件';
+        });
+
+        const clearBtn = document.getElementById('clear-btn');
+        const outputSection = document.getElementById('output-section');
+        clearBtn.addEventListener('click', () => {
+            document.getElementById('sequence-input').value = '';
+            fileUpload.value = '';
+            fileNameSpan.textContent = '未选择任何文件';
+            document.getElementById('recycle-step').value = '4';
+            outputSection.style.display = 'none';
+        });
+
+        const runBtn = document.getElementById('run-btn');
+        const loader = document.getElementById('loader');
+
+        runBtn.addEventListener('click', () => {
+            if (!document.getElementById('sequence-input').value) {
+                alert('请输入FASTA序列！');
+                return;
+            }
+
+            if (location.protocol === 'file:') {
+                alert('在线3D预览功能无法在本地file://协议下运行。请使用一个本地HTTP服务器来访问此页面（例如在终端中进入文件所在目录，运行 `python -m http.server` 命令，然后访问 http://localhost:8000 ）。');
+                return;
+            }
+
+            loader.style.display = 'block';
+            runBtn.disabled = true;
+            clearBtn.disabled = true;
+
+            setTimeout(() => {
+                fetch('files/功能详情页-蛋白质结构预测/9kpp_pred.pdb')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(pdbData => {
+                        predictedPdbData = pdbData;
+                        initViewer(predictedPdbData);
+                        
+                        loader.style.display = 'none';
+                        runBtn.disabled = false;
+                        clearBtn.disabled = false;
+                        outputSection.style.display = 'block';
+                        outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    })
+                    .catch(error => {
+                        console.error('There has been a problem with your fetch operation:', error);
+                        alert('加载PDB文件失败！');
+                        loader.style.display = 'none';
+                        runBtn.disabled = false;
+                        clearBtn.disabled = false;
+                    });
+            }, 2000);
+        });
+
+        function initViewer(pdbData) {
+            let viewerContainer = document.getElementById('pdb-viewer');
+            viewerContainer.innerHTML = ''; 
+            viewerInstance = $3Dmol.createViewer(viewerContainer);
+            viewerInstance.addModel(pdbData, "pdb");
+            applyViewerStyle();
+            viewerInstance.zoomTo();
+            viewerInstance.render();
+            viewerInstance.zoom(1.2, 1000);
+            updateControlButtons();
+        }
+        
+        function applyViewerStyle() {
+            if (!viewerInstance) return;
+            let styleSpec = {};
+            if (viewerSettings.color === 'spectrum') {
+                styleSpec[viewerSettings.style] = { color: 'spectrum' };
+            } else {
+                styleSpec[viewerSettings.style] = { colorscheme: viewerSettings.color };
+            }
+            viewerInstance.setStyle({}, styleSpec);
+            viewerInstance.render();
+        }
+
+        function setStyle(style) {
+            viewerSettings.style = style;
+            applyViewerStyle();
+            updateControlButtons();
+        }
+
+        function setColor(color) {
+            viewerSettings.color = color;
+            applyViewerStyle();
+            updateControlButtons();
+        }
+        
+        function updateControlButtons() {
+            document.querySelectorAll('.viewer-controls .control-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`style-${viewerSettings.style}-btn`).classList.add('active');
+            document.getElementById(`color-${viewerSettings.color}-btn`).classList.add('active');
+        }
+
+
+        document.getElementById('download-btn').addEventListener('click', () => {
+            if (!predictedPdbData) {
+                alert('没有可下载的PDB数据！');
+                return;
+            }
+            const blob = new Blob([predictedPdbData], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'predicted_structure.pdb';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-image');
+        const closeModalBtn = document.getElementById('close-modal');
+
+        function openImageModal(src) {
+            modalImg.src = src;
+            modal.classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            modal.classList.add('hidden');
+        }
+
+        closeModalBtn.addEventListener('click', closeImageModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) { closeImageModal(); }
+        });
+    </script>
+</body>
+</html>
+
