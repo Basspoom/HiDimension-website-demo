@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 3Dmol.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.1.0/3Dmol-min.js"></script>
     <style>
         :root {
             --primary-color: #17a2b8;
@@ -173,7 +175,87 @@
         .btn-secondary { background-color: #6c757d; color: white; }
         .btn-secondary:hover { background-color: #5a6268; }
 
-        .output-actions { margin-top: 25px; display: flex; gap: 15px; }
+        #pdb-viewer {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+       
+        .viewer-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+        }
+
+        .control-options-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .control-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .btn-group {
+            display: flex;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .control-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            background-color: #fff;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .btn-group .control-btn:last-child {
+            border-right: none;
+        }
+        .control-btn:hover {
+            background-color: #e9ecef;
+        }
+        .control-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .download-btn-style {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .download-btn-style:hover {
+            background-color: #138496;
+        }
+
     </style>
 </head>
 <body>
@@ -239,11 +321,32 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
                 </section>
                 
                 <section class="content-card" id="output-section" style="display: none;">
-                     <h2>结果预览</h2>
-                     <p>结构预测完成！您可以下载预测的PDB文件，并在本地使用Pymol等专业软件进行三维结构查看与分析。</p>
-                     <div class="output-actions">
-                        <button class="btn btn-primary text-sm px-4 py-2" id="download-btn">下载结果 (.pdb)</button>
-                     </div>
+                    <h2>结果预览</h2>
+                    <p>结构预测完成！您可以在下方进行三维结构预览，或下载PDB文件用于本地分析。</p>
+                    
+                    <div class="viewer-controls">
+                        <div class="control-options-wrapper">
+                            <div class="control-group">
+                                <label>样式:</label>
+                                <div class="btn-group">
+                                    <button id="style-cartoon-btn" class="control-btn active" onclick="setStyle('cartoon')">飘带</button>
+                                    <button id="style-sphere-btn" class="control-btn" onclick="setStyle('sphere')">球</button>
+                                    <button id="style-stick-btn" class="control-btn" onclick="setStyle('stick')">棍</button>
+                                    <button id="style-line-btn" class="control-btn" onclick="setStyle('line')">线</button>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>颜色:</label>
+                                <div class="btn-group">
+                                    <button id="color-spectrum-btn" class="control-btn active" onclick="setColor('spectrum')">彩虹</button>
+                                    <button id="color-chain-btn" class="control-btn" onclick="setColor('chain')">链</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="download-btn-style" id="download-btn">下载结果 (.pdb)</button>
+                    </div>
+
+                    <div id="pdb-viewer"></div>
                 </section>
             </div>
 
@@ -269,18 +372,17 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
                             <p>下图展示了输入FASTA序列并设置参数后，一键运行预测并获得可下载结果的流程。点击图片可查看大图。</p>
                             <img src="images/功能详情页-蛋白质结构预测/13.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
 
-                            <!-- 示例文件下载（新增） -->
-                            <div class="output-actions" style="margin-top:16px;">
+                            <div class="mt-4 flex flex-wrap gap-3">
                                 <a class="btn btn-primary text-sm px-4 py-2"
                                    href="files/功能详情页-蛋白质结构预测/9kpp_seq.fasta"
-                                   download="9kpp_seq.fasta">
-                                   下载示例输入（FASTA）
+                                   download="9kpp_seq.fasta" onclick="return forceDownload(this);">
+                                   下载示例输入 (FASTA)
                                 </a>
                               
                                 <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
                                    href="files/功能详情页-蛋白质结构预测/9kpp_pred.pdb"
-                                   download="9kpp_pred.pdb">
-                                   下载示例输出（PDB）
+                                   download="9kpp_pred.pdb" onclick="return forceDownload(this);">
+                                   下载示例输出 (PDB)
                                 </a>
                               </div>
 
@@ -289,10 +391,9 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
                 </div>
             </div>
         </div>
-        <!-- 参考文献 (底部全宽) -->
         <section id="references-section" class="content-card mt-8">
             <h2>引用文献</h2>
-            <blockquote><p>当前阶段未纳入引用文献，待内容进一步完善后将补充相关支撑文献。 <a</a></p></blockquote>
+            <blockquote><p>当前阶段未纳入引用文献，待内容进一步完善后将补充相关支撑文献。</p></blockquote>
         </section>
     </div>
 
@@ -302,10 +403,13 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
     </div>
 
     <script>
+        let viewerInstance = null;
+        let predictedPdbData = '';
+        let viewerSettings = { style: 'cartoon', color: 'spectrum' };
+
         function forceDownload(el){
-            // 如果是本地 file:// 打开，很多浏览器会无视 download，建议用 http 方式访问
             if (location.protocol === 'file:') {
-                alert('建议用本地 HTTP 服务打开页面：例如运行  python -m http.server  后访问 http://localhost:8000');
+                alert('建议用本地 HTTP 服务打开页面才能正常下载文件：例如运行  python -m http.server  后访问 http://localhost:8000');
             }
             const url = el.href;
             const filename = el.getAttribute('download') || url.split('/').pop();
@@ -321,26 +425,21 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
                 URL.revokeObjectURL(a.href);
                 a.remove();
             }).catch(()=>{
-                // 兜底退回普通跳转
                 window.location.href = url;
             });
-            return false; // 阻止默认跳转
-            }
+            return false;
+        }
 
         function openTab(evt, tabName) {
-            const tabcontent = document.querySelectorAll("#input-parameters-section .tab-content");
-            tabcontent.forEach(tab => tab.classList.remove('active'));
-            const tablinks = document.querySelectorAll("#input-parameters-section .tab-link");
-            tablinks.forEach(link => link.classList.remove('active'));
+            document.querySelectorAll("#input-parameters-section .tab-content").forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll("#input-parameters-section .tab-link").forEach(link => link.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
             evt.currentTarget.classList.add('active');
         }
 
         function openDetailTab(evt, tabName) {
-            const tabcontent = document.querySelectorAll("#details-section .detail-tab-content");
-            tabcontent.forEach(tab => tab.classList.remove('active'));
-            const tablinks = document.querySelectorAll("#details-section .tab-link");
-            tablinks.forEach(link => link.classList.remove('active'));
+            document.querySelectorAll("#details-section .detail-tab-content").forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll("#details-section .tab-link").forEach(link => link.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
             evt.currentTarget.classList.add('active');
         }
@@ -363,28 +462,99 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
 
         const runBtn = document.getElementById('run-btn');
         const loader = document.getElementById('loader');
-        const mockPdbResult = `ATOM      1  N   MET A   1      27.289  34.685  27.289  1.00 20.00           N
-ATOM      2  CA  MET A   1      27.813  35.912  27.813  1.00 20.00           C
-... (此为示例，省略大量PDB内容) ...
-ATOM   1234  OXT ILE A 150      50.123  12.456  33.987  1.00 25.00           O
-TER`;
 
         runBtn.addEventListener('click', () => {
+            if (!document.getElementById('sequence-input').value) {
+                alert('请输入FASTA序列！');
+                return;
+            }
+
+            if (location.protocol === 'file:') {
+                alert('在线3D预览功能无法在本地file://协议下运行。请使用一个本地HTTP服务器来访问此页面（例如在终端中进入文件所在目录，运行 `python -m http.server` 命令，然后访问 http://localhost:8000 ）。');
+                return;
+            }
+
             loader.style.display = 'block';
             runBtn.disabled = true;
             clearBtn.disabled = true;
+
             setTimeout(() => {
-                loader.style.display = 'none';
-                runBtn.disabled = false;
-                clearBtn.disabled = false;
-                outputSection.style.display = 'block';
-                outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                fetch('files/功能详情页-蛋白质结构预测/9kpp_pred.pdb')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(pdbData => {
+                        predictedPdbData = pdbData;
+                        initViewer(predictedPdbData);
+                        
+                        loader.style.display = 'none';
+                        runBtn.disabled = false;
+                        clearBtn.disabled = false;
+                        outputSection.style.display = 'block';
+                        outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    })
+                    .catch(error => {
+                        console.error('There has been a problem with your fetch operation:', error);
+                        alert('加载PDB文件失败！');
+                        loader.style.display = 'none';
+                        runBtn.disabled = false;
+                        clearBtn.disabled = false;
+                    });
             }, 2000);
         });
 
+        function initViewer(pdbData) {
+            let viewerContainer = document.getElementById('pdb-viewer');
+            viewerContainer.innerHTML = ''; 
+            viewerInstance = $3Dmol.createViewer(viewerContainer);
+            viewerInstance.addModel(pdbData, "pdb");
+            applyViewerStyle();
+            viewerInstance.zoomTo();
+            viewerInstance.render();
+            viewerInstance.zoom(1.2, 1000);
+            updateControlButtons();
+        }
+        
+        function applyViewerStyle() {
+            if (!viewerInstance) return;
+            let styleSpec = {};
+            if (viewerSettings.color === 'spectrum') {
+                styleSpec[viewerSettings.style] = { color: 'spectrum' };
+            } else {
+                styleSpec[viewerSettings.style] = { colorscheme: viewerSettings.color };
+            }
+            viewerInstance.setStyle({}, styleSpec);
+            viewerInstance.render();
+        }
+
+        function setStyle(style) {
+            viewerSettings.style = style;
+            applyViewerStyle();
+            updateControlButtons();
+        }
+
+        function setColor(color) {
+            viewerSettings.color = color;
+            applyViewerStyle();
+            updateControlButtons();
+        }
+        
+        function updateControlButtons() {
+            document.querySelectorAll('.viewer-controls .control-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`style-${viewerSettings.style}-btn`).classList.add('active');
+            document.getElementById(`color-${viewerSettings.color}-btn`).classList.add('active');
+        }
+
+
         document.getElementById('download-btn').addEventListener('click', () => {
-            const pdbContent = mockPdbResult;
-            const blob = new Blob([pdbContent], { type: 'text/plain;charset=utf-8' });
+            if (!predictedPdbData) {
+                alert('没有可下载的PDB数据！');
+                return;
+            }
+            const blob = new Blob([predictedPdbData], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
