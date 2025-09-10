@@ -9,7 +9,7 @@
  	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
  	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet"> 
  	<script src="https://cdn.tailwindcss.com"></script> 
- 	<script src="https://cdn.jsdelivr.net/npm/ngl@2.0.0-dev.38/dist/ngl.js"></script> 
+ 	<script src="https://cdnjs.cloudflare.com/ajax/libs/3dmol/2.0.4/3Dmol.js"></script> 
  	<style> 
  		:root { 
  			--primary-color: #17a2b8; 
@@ -222,17 +222,13 @@
  				 
  				<section class="content-card" id="output-section" style="display: none;">
  					<h2>结果预览</h2>
- 					<p>结构补齐完成！下方是补齐前后的三维结构对比（基于示例文件）。<strong>新增片段已用红色高亮标出</strong>。您可以同步旋转/缩放两个视图进行详细比较，也可以下载补齐后的PDB文件。</p>
+ 					<p>结构补齐完成！下方是补齐后的三维结构（基于示例文件）。原有部分为浅蓝色，<strong>新增片段已用红色高亮标出</strong>。您可以旋转/缩放视图进行详细查看，也可以下载补齐后的PDB文件。</p>
  					
  					<!-- Visualization container -->
- 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border rounded-lg p-2 bg-gray-50">
+ 					<div class="mt-4 border rounded-lg p-2 bg-gray-50">
  						<div>
- 							<h3 class="text-center font-semibold mb-2">补齐前</h3>
- 							<div id="viewer-before" class="relative w-full h-96 bg-white border rounded-md"></div>
- 						</div>
- 						<div>
- 							<h3 class="text-center font-semibold mb-2">补齐后</h3>
- 							<div id="viewer-after" class="relative w-full h-96 bg-white border rounded-md"></div>
+ 							<h3 class="text-center font-semibold mb-2">补齐后结构</h3>
+ 							<div id="viewer-after" class="relative w-full" style="height: 500px; background-color: white;"></div>
  						</div>
  					</div>
  
@@ -352,7 +348,7 @@
  			}, 2000); 
  		}); 
  		
- 		// --- NGL Viewer Visualization Logic ---
+ 		// --- 3Dmol.js Visualization Logic ---
  		function getResidueSetFromText(pdbText) {
  			const lines = pdbText.split('\n');
  			const resiSet = new Set();
@@ -368,21 +364,11 @@
  		}
 
  		async function setupViewers() {
- 			const beforeContainer = document.getElementById('viewer-before');
  			const afterContainer = document.getElementById('viewer-after');
- 			beforeContainer.innerHTML = ''; // Clear any previous content
  			afterContainer.innerHTML = ''; // Clear any previous content
 
  			try {
-                // --- Create NGL Stages ---
- 				const stageBefore = new NGL.Stage(beforeContainer);
-                const stageAfter = new NGL.Stage(afterContainer);
-                
-                // Handle window resizing
-                window.addEventListener("resize", function () {
-                    stageBefore.handleResize();
-                    stageAfter.handleResize();
-                }, false);
+ 				const viewer_after = $3Dmol.createViewer(afterContainer, { backgroundColor: 'white' });
 
  				const [pdbBeforeRes, pdbAfterRes] = await Promise.all([
  					fetch('files/功能详情页-蛋白质结构补齐/EOMT_without_activesite.pdb'),
@@ -396,47 +382,29 @@
  				const pdbBeforeText = await pdbBeforeRes.text();
  				const pdbAfterText = await pdbAfterRes.text();
 
-                const beforeBlob = new Blob([pdbBeforeText], { type: 'text/plain' });
-                const afterBlob = new Blob([pdbAfterText], { type: 'text/plain' });
-
- 				// --- Render "Before" structure ---
- 				stageBefore.loadFile(beforeBlob, { ext: "pdb" }).then(function (component) {
-                    component.addRepresentation("cartoon", { color: "#80d0ff" });
-                    component.autoView();
-                });
-
-
- 				// --- Render "After" structure with differential coloring ---
+ 				// --- Determine new residues ---
  				const originalResiSet = getResidueSetFromText(pdbBeforeText);
  				const allAfterResiSet = getResidueSetFromText(pdbAfterText);
-
  				const newResidues = [];
  				allAfterResiSet.forEach(resi => {
  					if (!originalResiSet.has(resi)) {
  						newResidues.push(resi);
  					}
  				});
- 				
-                const newResiduesSelection = newResidues.join(" or ");
 
- 				stageAfter.loadFile(afterBlob, { ext: "pdb" }).then(function (component) {
-                    // Original part in blue
-                    component.addRepresentation("cartoon", { color: "#80d0ff" });
-                    // New part in red
-                    if(newResiduesSelection) {
-                         component.addRepresentation("cartoon", { color: "red", sele: newResiduesSelection });
-                    }
-                    component.autoView();
-                });
-
- 				// --- Sync cameras ---
- 				stageBefore.viewerControls.sync(stageAfter.viewerControls);
-                stageAfter.viewerControls.sync(stageBefore.viewerControls);
-
+ 				// --- Render "After" structure with differential coloring ---
+ 				viewer_after.addModel(pdbAfterText, 'pdb');
+ 				// Base style: light blue
+ 				viewer_after.setStyle({}, { cartoon: { style: 'trace', color: '#80d0ff' } });
+ 				// Highlight new parts in red
+ 				if (newResidues.length > 0) {
+ 					viewer_after.addStyle({ resi: newResidues }, { cartoon: { style: 'trace', color: 'red' } });
+ 				}
+ 				viewer_after.zoomTo();
+ 				viewer_after.render();
 
  			} catch (error) {
- 				console.error("Error setting up NGL viewers:", error);
- 				beforeContainer.innerHTML = `<div class="p-4 text-red-600">无法加载示例PDB文件: ${error.message}</div>`;
+ 				console.error("Error setting up 3Dmol viewer:", error);
  				afterContainer.innerHTML = `<div class="p-4 text-red-600">无法加载示例PDB文件: ${error.message}</div>`;
  			}
  		}
