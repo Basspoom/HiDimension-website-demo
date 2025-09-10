@@ -182,33 +182,56 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
         }
+       
         .viewer-controls {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            gap: 1rem;
+            padding: 1rem;
             background-color: #f8f9fa;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 1.25rem;
         }
+
+        .control-options-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
         .control-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.75rem;
         }
         .control-group label {
             font-weight: 600;
             font-size: 14px;
+            color: var(--text-color);
         }
+
+        .btn-group {
+            display: flex;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
         .control-btn {
             padding: 6px 12px;
             font-size: 14px;
             background-color: #fff;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border: none;
+            border-right: 1px solid var(--border-color);
             cursor: pointer;
-            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .btn-group .control-btn:last-child {
+            border-right: none;
         }
         .control-btn:hover {
             background-color: #e9ecef;
@@ -216,8 +239,23 @@
         .control-btn.active {
             background-color: var(--primary-color);
             color: white;
-            border-color: var(--primary-color);
         }
+
+        .download-btn-style {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .download-btn-style:hover {
+            background-color: #138496;
+        }
+
     </style>
 </head>
 <body>
@@ -287,19 +325,25 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
                     <p>结构预测完成！您可以在下方进行三维结构预览，或下载PDB文件用于本地分析。</p>
                     
                     <div class="viewer-controls">
-                        <div class="control-group">
-                            <label>样式:</label>
-                            <button id="style-cartoon-btn" class="control-btn active" onclick="setStyle('cartoon')">飘带</button>
-                            <button id="style-sphere-btn" class="control-btn" onclick="setStyle('sphere')">球</button>
-                            <button id="style-stick-btn" class="control-btn" onclick="setStyle('stick')">棍</button>
-                            <button id="style-line-btn" class="control-btn" onclick="setStyle('line')">线</button>
+                        <div class="control-options-wrapper">
+                            <div class="control-group">
+                                <label>样式:</label>
+                                <div class="btn-group">
+                                    <button id="style-cartoon-btn" class="control-btn active" onclick="setStyle('cartoon')">飘带</button>
+                                    <button id="style-sphere-btn" class="control-btn" onclick="setStyle('sphere')">球</button>
+                                    <button id="style-stick-btn" class="control-btn" onclick="setStyle('stick')">棍</button>
+                                    <button id="style-line-btn" class="control-btn" onclick="setStyle('line')">线</button>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>颜色:</label>
+                                <div class="btn-group">
+                                    <button id="color-spectrum-btn" class="control-btn active" onclick="setColor('spectrum')">彩虹</button>
+                                    <button id="color-chain-btn" class="control-btn" onclick="setColor('chain')">链</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="control-group">
-                            <label>颜色:</label>
-                            <button id="color-spectrum-btn" class="control-btn active" onclick="setColor('spectrum')">彩虹</button>
-                            <button id="color-chain-btn" class="control-btn" onclick="setColor('chain')">链</button>
-                        </div>
-                         <button class="btn btn-primary text-sm px-4 py-2" id="download-btn">下载结果 (.pdb)</button>
+                        <button class="download-btn-style" id="download-btn">下载结果 (.pdb)</button>
                     </div>
 
                     <div id="pdb-viewer"></div>
