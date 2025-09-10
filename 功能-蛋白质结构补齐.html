@@ -208,7 +208,7 @@
 <body>
 
     <header id="header-nav">
-        <a href="首页.html"><img src="images/首页/u108.png" alt="Logo" style="width: 240px; height: 60px;"></a>
+        <a href="首页.html"><img src="images/common/logo.png" alt="Logo" style="width: 240px; height: 60px;"></a>
         <div class="header-title">蛋白质结构补齐 - 功能详情</div>
     </header>
 
@@ -294,17 +294,17 @@
                         <div id="example-content" class="detail-tab-content">
                             <h2>使用示例</h2>
                             <p>下图展示了上传含缺失片段的PDB文件后，一键运行补齐并获得可下载结果的流程。点击图片可查看大图。</p>
-                            <img src="images/功能详情页-蛋白质结构补齐/12.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
+                            <img src="images/structure-completion/example.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
 
                             <div class="mt-4 flex flex-wrap gap-3">
                                 <a class="btn btn-primary text-sm px-4 py-2"
-                                   href="files/功能详情页-蛋白质结构补齐/EOMT_without_activesite.pdb"
+                                   href="files/structure-completion/EOMT_without_activesite.pdb"
                                    download="EOMT_without_activesite.pdb" onclick="return forceDownload(this);">
                                    下载示例输入 (PDB)
                                 </a>
                               
                                 <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
-                                   href="files/功能详情页-蛋白质结构补齐/EOMT_reconstruction.pdb"
+                                   href="files/structure-completion/EOMT_reconstruction.pdb"
                                    download="EOMT_reconstruction.pdb" onclick="return forceDownload(this);">
                                    下载示例输出 (PDB)
                                 </a>
@@ -394,7 +394,10 @@
         }
 
         runBtn.addEventListener('click', () => {
-            // 已移除对用户输入的检查
+             if (!document.getElementById('pdb-input').value && fileUpload.files.length === 0) {
+                alert('请输入或上传PDB结构！');
+                return;
+            }
             
             if (location.protocol === 'file:') {
                 alert('在线3D预览功能无法在本地file://协议下运行。请使用一个本地HTTP服务器来访问此页面（例如在终端中进入文件所在目录，运行 `python -m http.server` 命令，然后访问 http://localhost:8000 ）。');
@@ -406,8 +409,8 @@
             clearBtn.disabled = true;
 
             setTimeout(() => {
-                const fetchBefore = fetch('files/功能详情页-蛋白质结构补齐/EOMT_without_activesite.pdb').then(res => res.text());
-                const fetchAfter = fetch('files/功能详情页-蛋白质结构补齐/EOMT_reconstruction.pdb').then(res => res.text());
+                const fetchBefore = fetch('files/structure-completion/EOMT_without_activesite.pdb').then(res => res.text());
+                const fetchAfter = fetch('files/structure-completion/EOMT_reconstruction.pdb').then(res => res.text());
 
                 Promise.all([fetchBefore, fetchAfter])
                     .then(([beforeData, afterData]) => {
@@ -418,7 +421,7 @@
                         const afterResis = getResidueIds(afterPdbData);
                         newResidueIds = [...afterResis].filter(r => !beforeResis.has(r));
                         
-                        initViewers(beforePdbData, afterData);
+                        initViewers(beforePdbData, afterPdbData);
                         
                         loader.style.display = 'none';
                         runBtn.disabled = false;
@@ -510,3 +513,5 @@
     </script>
 </body>
 </html>
+
+
