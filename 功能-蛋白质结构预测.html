@@ -274,12 +274,12 @@
         </div>
         <header class="page-header">
             <h1>蛋白质结构预测</h1>
-            <p>构建一个兼具高效性与高精度的蛋白质结构预测模型，推理速度大幅超越 AlphaFold3，平均推理速度小于1分钟/条。</p>
+            <p>构建一个兼具高效性与高精度的蛋白质结构预测模型，推理速度比肩 AlphaFold3，平均推理速度小于1分钟/条。</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div id="main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
 
-            <div class="lg:col-span-7 flex flex-col gap-8">
+            <div id="left-column" class="lg:col-span-7 flex flex-col gap-8 transition-all duration-500 ease-in-out">
                 <section class="content-card" id="input-parameters-section">
                     <nav class="tabs">
                         <button class="tab-link active" onclick="openTab(event, 'input-tab')">输入</button>
@@ -350,7 +350,13 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
                 </section>
             </div>
 
-            <div class="lg:col-span-5">
+            <button id="collapse-btn" class="absolute top-1/2 right-[41.666667%] -translate-y-1/2 translate-x-1/2 z-30 bg-white hover:bg-cyan-500 text-cyan-600 hover:text-white rounded-full w-10 h-10 shadow-lg flex items-center justify-center transition-all duration-500 ease-in-out">
+                <svg id="collapse-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+
+            <div id="right-column" class="lg:col-span-5 transition-all duration-500 ease-in-out">
                 <div class="sticky top-28 flex flex-col gap-8">
                     <section id="details-section" class="content-card">
                         <nav class="tabs">
@@ -362,7 +368,7 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
                             <h2>能力介绍</h2>
                             <p>本任务旨在在基本保持预测精度的前提下，大幅提升蛋白质结构预测的效率。具体做法是利用蛋白质语言模型对序列进行解析，从而跳过传统的多序列比对（MSA）步骤，以显著降低推理开销。同时，将常用的序列比对模板搜索替换为基于嵌入的检索方法，使模型不仅运行更高效，也更容易搜索到远程同源蛋白质。</p>
                             <ul class="list-disc list-inside mt-4 space-y-2">
-                                <li><strong>性能亮点:</strong> 性能达到 AlphaFold3 的 90%。耗时为 AlphaFold3 的十分之一，平均推理速度 <1 分钟每条。</li>
+                                <li><strong>性能亮点:</strong> 性能达到 AlphaFold3 的 90%。速度为 AlphaFold3 的 10 余倍，平均推理速度 <1 分钟每条。</li>
                                 <li><strong>模型优势:</strong> 该功能基于我们自主研发的 <strong>BiooSeek0.5</strong> 进行搜索，替代 MSA，从而显著提升推理效率。</li>
                                 <li><strong>操作简便:</strong> 在本功能页中，用户只需要输入蛋白质氨基酸序列，即可调用 <strong>BiooFold1.0</strong> 进行结构预测，输出蛋白质结构文件 (.pdb)，并提供下载，便于用户进一步分析与应用。</li>
                             </ul>
@@ -488,7 +494,7 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
                     })
                     .then(pdbData => {
                         predictedPdbData = pdbData;
-                        initViewer(predictedPdbData);
+                        initViewer(pdbData);
                         
                         loader.style.display = 'none';
                         runBtn.disabled = false;
@@ -582,7 +588,26 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
         modal.addEventListener('click', (e) => {
             if (e.target === modal) { closeImageModal(); }
         });
+
+        // --- 折叠逻辑 ---
+        const collapseBtn = document.getElementById('collapse-btn');
+        const collapseIcon = document.getElementById('collapse-icon');
+        const leftColumn = document.getElementById('left-column');
+        const rightColumn = document.getElementById('right-column');
+
+        collapseBtn.addEventListener('click', () => {
+            // 切换左侧栏的宽度
+            leftColumn.classList.toggle('lg:col-span-7');
+            leftColumn.classList.toggle('lg:col-span-12');
+
+            // 切换右侧栏的可见性
+            rightColumn.classList.toggle('hidden');
+
+            // 切换按钮的位置和图标方向
+            collapseBtn.classList.toggle('right-[41.666667%]'); // 展开时的位置 (5/12)
+            collapseBtn.classList.toggle('right-0'); // 折叠时的位置
+            collapseIcon.classList.toggle('rotate-180');
+        });
     </script>
 </body>
 </html>
-

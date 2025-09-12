@@ -213,6 +213,7 @@
             font-size: 14px;
             line-height: 1.6;
         }
+        .param-section { border-left: 3px solid #e0e8f0; padding-left: 20px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -225,7 +226,7 @@
     <div class="main-container">
         <div class="mb-6">
             <a href="功能目录页.html" class="text-sm font-medium text-cyan-700 hover:text-cyan-900 transition-colors duration-200 flex items-center gap-2">
-                <svg xmlns="http://www.w.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
                 回到功能目录
             </a>
         </div>
@@ -234,9 +235,9 @@
             <p>通过智能化的CDS序列重设计，提高在不同底盘细胞中的表达效率。一条序列的优化仅需分钟级别，可助您快速得到结果。</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div id="main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
 
-            <div class="lg:col-span-7 flex flex-col gap-8">
+            <div id="left-column" class="lg:col-span-7 flex flex-col gap-8 transition-all duration-500 ease-in-out">
                 <section class="content-card" id="input-parameters-section">
                     <nav class="tabs">
                         <button class="tab-link active" onclick="openTab(event, 'input-tab')">输入</button>
@@ -317,25 +318,6 @@
                         </div>
 
 
-                         <!-- <div class="form-group">
-                            <label class="form-label">2. 选择生成策略</label>
-                            <div class="param-option-group">
-                                <label><input type="radio" name="generation-strategy" value="greedy" checked onchange="toggleBeamWidth()"> 贪婪解码</label>
-                                <label><input type="radio" name="generation-strategy" value="beam" onchange="toggleBeamWidth()"> 束搜索</label>
-                                <label><input type="radio" name="generation-strategy" value="sample" onchange="toggleBeamWidth()"> 是否采样</label>
-                            </div>
-                            <div id="beam-width-container" class="mt-4 pl-6" style="display: none;">
-                                <label for="beam-width" class="form-label text-sm">束宽 (Beam Width)</label>
-                                <select id="beam-width" class="form-select">
-                                    <option value="5">5</option>
-                                    <option value="10" selected>10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                </select>
-                            </div>
-                        </div> -->
-
-
                         <br><br>
                          <div class="form-group">
                             <label class="form-label">3. 勾选要屏蔽的酶切位点</label>
@@ -367,11 +349,6 @@
                             </p>
                             <img src="images/功能详情页-蛋白质序列设计/111.png" alt="参数对比图" class="w-full h-auto rounded-lg border">
                        </div>
-
-                         <!-- <div class="form-group">
-                            <label for="return-count" class="form-label">4. 设返回条数</label>
-                            <input type="number" id="return-count" class="form-input" min="1" max="20" value="5">
-                        </div> -->
                     </div>
 
                     <div class="action-buttons">
@@ -396,7 +373,13 @@
                 </section>
             </div>
 
-            <div class="lg:col-span-5">
+            <button id="collapse-btn" class="absolute top-1/2 right-[41.666667%] -translate-y-1/2 translate-x-1/2 z-30 bg-white hover:bg-cyan-500 text-cyan-600 hover:text-white rounded-full w-10 h-10 shadow-lg flex items-center justify-center transition-all duration-500 ease-in-out">
+                <svg id="collapse-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+
+            <div id="right-column" class="lg:col-span-5 transition-all duration-500 ease-in-out">
                 <div class="sticky top-28 flex flex-col gap-8">
                     <section id="details-section" class="content-card">
                         <nav class="tabs">
@@ -540,11 +523,9 @@
             
             // Reset params
             document.querySelector('input[name="chassis-cell"][value="HEK293T"]').checked = true;
-            document.querySelector('input[name="generation-strategy"][value="greedy"]').checked = true;
-            toggleBeamWidth();
+            document.querySelector('input[name="decoding-method"][value="greedy"]').checked = true;
             document.querySelectorAll('input[name="enzyme"]').forEach(checkbox => checkbox.checked = false);
-            document.getElementById('return-count').value = '5';
-            
+            updateParamsView();
             document.getElementById('output-section').style.display = 'none';
         });
 
@@ -611,7 +592,27 @@ AGCTACTGA`;
         });
         
         document.addEventListener('DOMContentLoaded', () => {
-            toggleBeamWidth();
+            updateParamsView();
+        });
+
+        // --- 折叠逻辑 ---
+        const collapseBtn = document.getElementById('collapse-btn');
+        const collapseIcon = document.getElementById('collapse-icon');
+        const leftColumn = document.getElementById('left-column');
+        const rightColumn = document.getElementById('right-column');
+
+        collapseBtn.addEventListener('click', () => {
+            // 切换左侧栏的宽度
+            leftColumn.classList.toggle('lg:col-span-7');
+            leftColumn.classList.toggle('lg:col-span-12');
+
+            // 切换右侧栏的可见性
+            rightColumn.classList.toggle('hidden');
+
+            // 切换按钮的位置和图标方向
+            collapseBtn.classList.toggle('right-[41.666667%]'); // 展开时的位置 (5/12)
+            collapseBtn.classList.toggle('right-0'); // 折叠时的位置
+            collapseIcon.classList.toggle('rotate-180');
         });
     </script>
 </body>

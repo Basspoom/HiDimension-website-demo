@@ -29,11 +29,8 @@
             font-family: 'Inter', 'Noto Sans SC', sans-serif;
             background-color: var(--background-color);
             margin: 0;
-            /* padding: 50px 20px;  修改padding以适应header */
-            padding-top: 120px; /* 为固定的header留出空间 */
+            padding-top: 80px; /* 为固定的header留出空间 */
             padding-bottom: 50px;
-            padding-left: 20px;
-            padding-right: 20px;
             box-sizing: border-box;
         }
         
@@ -95,6 +92,161 @@
             font-weight: 700;
             cursor: pointer;
         }
+        
+        /* --- Search Bar --- */
+        .search-container {
+            background-color: #eaf0f6;
+            padding: 20px 40px;
+        }
+        
+        .search-header {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding-bottom: 15px;
+        }
+
+        .search-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--text-color);
+        }
+
+        #toggle-search-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+        #toggle-search-btn svg {
+            width: 24px;
+            height: 24px;
+            color: var(--subtle-text-color);
+            transition: transform 0.3s ease;
+        }
+
+        .search-container.collapsed #toggle-search-btn svg {
+            transform: rotate(180deg);
+        }
+
+
+        .search-content-wrapper {
+            max-height: 200px; /* Adjust as needed */
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, margin-top 0.4s ease-in-out;
+        }
+
+        .search-container.collapsed .search-content-wrapper {
+            max-height: 0;
+        }
+
+
+        .search-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .search-input-wrapper svg {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: #999;
+        }
+        
+        #search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            font-size: 16px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background-color: var(--card-background-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(23, 162, 184, 0.2);
+        }
+
+        #reset-search-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background-color: #ced4da;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #reset-search-btn:hover {
+            background-color: #adb5bd;
+        }
+
+        .keyword-tags {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .keyword-tags span {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--subtle-text-color);
+        }
+
+        .keyword-btn {
+            padding: 6px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            background-color: var(--card-background-color);
+            color: var(--subtle-text-color);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .keyword-btn:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .keyword-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+
+        #no-results-message {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 18px;
+            color: var(--subtle-text-color);
+            display: none;
+        }
 
 
         /* --- 卡片网格布局 --- */
@@ -105,6 +257,7 @@
             width: 100%;
             max-width: 1400px;
             margin: 0 auto; /* 居中显示 */
+            padding: 40px;
         }
 
         /* --- 单个卡片样式 --- */
@@ -419,8 +572,11 @@
         }
         
         @media (max-width: 768px) {
-             body { padding: 100px 15px 30px; }
-            .card-container { grid-template-columns: 1fr; gap: 25px; }
+            body { padding-top: 80px; }
+            .search-container { padding: 20px 15px; }
+            .search-bar { flex-direction: column; }
+            .keyword-tags { flex-wrap: wrap; }
+            .card-container { grid-template-columns: 1fr; gap: 25px; padding: 20px 15px; }
             .card-content { padding: 25px; }
             #u831 { padding: 0 20px; }
             #u950 { display: none; }
@@ -449,6 +605,35 @@
             <div id="u954" class="menu-item">退出登录</div>
         </div>
     </div>
+    
+    <div class="search-container">
+        <div class="search-header">
+            <h3>功能检索</h3>
+            <button id="toggle-search-btn" title="收起/展开">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+            </button>
+        </div>
+        <div class="search-content-wrapper">
+            <div class="search-wrapper">
+                <div class="search-bar">
+                    <div class="search-input-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="search-input" placeholder="通过标题、关键词搜索...">
+                    </div>
+                    <button id="reset-search-btn" title="复原">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    </button>
+                </div>
+                <div class="keyword-tags">
+                    <span>快速查找:</span>
+                    <button class="keyword-btn">检索</button>
+                    <button class="keyword-btn">生成</button>
+                    <button class="keyword-btn">预测</button>
+                    <button class="keyword-btn">优化</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <div class="card-container">
@@ -464,7 +649,7 @@
                 <p class="card-description">打破同源束缚，大幅扩展可检索空间与效率，可发现序列相似性低但结构同源性高的蛋白质。此模型曾成功挖掘出世界目前已知最小长度且具有活性的TnpB。</p>
                 <div class="card-tags">
                     <span class="card-tag primary-tag">蛋白质</span>
-                    <span class="card-tag">检索</span>
+                    <span class="card-tag primary-tag">检索</span>
                     <span class="card-tag">向量数据库</span>
                     <span class="card-tag">Embedding</span>
                 </div>
@@ -482,6 +667,7 @@
                 <p class="card-description">基于柔性感知SE(3)编码与物理几何约束，实现结构缺失片段的极速、物理可行且整体一致的自动补齐，显著优于传统采样建模，支持网页交互式操作。</p>
                 <div class="card-tags">
                     <span class="card-tag primary-tag">蛋白质</span>
+                    <span class="card-tag primary-tag">生成</span>
                     <span class="card-tag">结构补齐</span>
                     <span class="card-tag">插入片段</span>
                 </div>
@@ -500,6 +686,7 @@
                 <p class="card-description">打造高效高精度蛋白质结构预测模型，以十分之一时间实现 AlphaFold3 90% 性能，平均推理小于一分钟。</p>
                 <div class="card-tags">
                     <span class="card-tag primary-tag">蛋白质</span>
+                    <span class="card-tag primary-tag">预测</span>
                     <span class="card-tag">结构预测</span>
                 </div>
             </div>
@@ -517,6 +704,7 @@
                 <p class="card-description">模型结合实验柔性信息和先进生成技术，高效设计能自发折叠实现功能的可合成氨基酸序列，将结构设想快速转化为实际分子，全面提升效率与精度。</p>
                 <div class="card-tags">
                     <span class="card-tag primary-tag">蛋白质</span>
+                    <span class="card-tag primary-tag">生成</span>
                     <span class="card-tag">序列设计</span>
                     <span class="card-tag">逆折叠</span>
                 </div>
@@ -535,9 +723,10 @@
                 <p class="card-description">提升蛋白质热稳定性常需通过大量实验筛选有效突变，成本高且效率低；我们通过“结构-柔性”联合表征解析位点特性，结合多指标打分与嗜热蛋白微调模型，智能推荐最优突变方案，大幅降低实验探索成本。</p>
                 <div class="card-tags">
                     <span class="card-tag primary-tag">蛋白质</span>
-                    <span class="card-tag">突变</span>
-                    <span class="card-tag">稳定性优化</span>
+                    <span class="card-tag primary-tag">优化</span>
                     <span class="card-tag">热稳定性</span>
+                    <span class="card-tag">突变</span>
+
                 </div>
             </div>
         </div>
@@ -554,6 +743,7 @@
                 <p class="card-description">智能化CDS序列重设计显著提升多种底盘细胞中的蛋白表达效率，单例最高提升超300%。</p>
                 <div class="card-tags">
                     <span class="card-tag primary-tag">蛋白质</span>
+                    <span class="card-tag primary-tag">优化</span>
                     <span class="card-tag">密码子</span>
                     <span class="card-tag">表达优化</span>
                 </div>
@@ -570,14 +760,15 @@
                     <h2 class="card-title">功能许愿池</h2>
                 </div>
                 <p class="card-description">您是否有些特别的需求或创新的想法？告诉我们您希望平台未来能增加什么功能，您的建议对我们至关重要！</p>
-                <div class="card-tags">
+                <!-- <div class="card-tags">
                     <span class="card-tag primary-tag">用户反馈</span>
                     <span class="card-tag">新功能建议</span>
                     <span class="card-tag">共创</span>
-                </div>
+                </div> -->
             </div>
         </div>
-	</div>	
+	</div>
+    <div id="no-results-message">未找到匹配的功能。</div>
 
     
     <div id="modal-overlay" class="modal-overlay">
@@ -716,11 +907,11 @@
             const loginPanel = document.getElementById('login-panel');
             const registerPanel = document.getElementById('register-panel');
             const forgotPasswordPanel = document.getElementById('forgot-password-panel');
-            const wishPanel = document.getElementById('wish-panel'); // 新增
-            const thankYouPanel = document.getElementById('thank-you-panel'); // 新增
+            const wishPanel = document.getElementById('wish-panel'); 
+            const thankYouPanel = document.getElementById('thank-you-panel'); 
             
             // --- 获取功能许愿卡片 ---
-            const featureWishCard = document.getElementById('feature-wish-card'); // 新增
+            const featureWishCard = document.getElementById('feature-wish-card'); 
 
 			// --- 页面跳转 ---
 			document.getElementById('u765').addEventListener('click', function() {
@@ -763,140 +954,174 @@
             
             // --- 模态框逻辑 ---
             function showModal(panelToShow) {
-            // 隐藏 overlay 里的所有 .modal-container
-            document.querySelectorAll('#modal-overlay .modal-container')
-                .forEach(p => p.style.display = 'none');
-
-            // 显示指定面板
-            panelToShow.style.display = 'block';
-            modalOverlay.classList.add('active');
+                document.querySelectorAll('#modal-overlay .modal-container')
+                    .forEach(p => p.style.display = 'none');
+                panelToShow.style.display = 'block';
+                modalOverlay.classList.add('active');
             }
 
             function hideModal() {
-            modalOverlay.classList.remove('active');
-            // 为了保险，顺手把所有面板也关掉
-            document.querySelectorAll('#modal-overlay .modal-container')
-                .forEach(p => p.style.display = 'none');
+                modalOverlay.classList.remove('active');
+                document.querySelectorAll('#modal-overlay .modal-container')
+                    .forEach(p => p.style.display = 'none');
             }
 
 
             // --- 事件监听 ---
-
-            // 打开登录
             loginButton.addEventListener('click', () => showModal(loginPanel));
             
-            // 登录、注册、忘记密码之间的切换
             document.getElementById('show-register-link').addEventListener('click', () => showModal(registerPanel));
             document.getElementById('show-login-link').addEventListener('click', () => showModal(loginPanel));
             document.getElementById('back-to-login-link').addEventListener('click', () => showModal(loginPanel));
             document.getElementById('forgot-password-link').addEventListener('click', () => showModal(forgotPasswordPanel));
             
-            // 【新增】打开功能许愿面板
             featureWishCard.addEventListener('click', () => showModal(wishPanel));
 
-            // 【新增】提交功能建议
             document.getElementById('submit-wish-btn').addEventListener('click', function() {
-                // 在这里可以添加代码来获取textarea中的内容并发送到后端
-                // const suggestion = document.getElementById('feature-suggestion').value;
-                // console.log('用户建议:', suggestion);
-                showModal(thankYouPanel); // 显示感谢面板
+                showModal(thankYouPanel); 
             });
 
-            // 所有关闭按钮
             document.getElementById('close-login').addEventListener('click', hideModal);
             document.getElementById('close-register').addEventListener('click', hideModal);
             document.getElementById('close-forgot').addEventListener('click', hideModal);
-            document.getElementById('close-wish').addEventListener('click', hideModal); // 新增
-            document.getElementById('close-thank-you-btn').addEventListener('click', hideModal); // 新增
+            document.getElementById('close-wish').addEventListener('click', hideModal);
+            document.getElementById('close-thank-you-btn').addEventListener('click', hideModal);
 
-
-            // 点击遮罩层关闭
             modalOverlay.addEventListener('click', function(event) {
                 if (event.target === modalOverlay) {
                     hideModal();
                 }
             });
 
-            // 模拟登录成功
             loginPanel.querySelector('.submit-btn').addEventListener('click', function(){
                 hideModal();
                 toggleLoginState();
             });
 
-
-            // --- 用户菜单下拉 ---
             userAvatar.addEventListener('click', function(event) {
                 event.stopPropagation();
                 userMenu.classList.toggle('active');
             });
             
-            // 点击页面其他地方关闭菜单
             document.addEventListener('click', function() {
                  userMenu.classList.remove('active');
             });
 
-            // 模拟退出登录
             document.getElementById('u954').addEventListener('click', function(){
                  toggleLoginState();
             });
 
-            // 取面板引用
             const profilePanel = document.getElementById('profile-panel');
 
-            // 打开「修改信息」
             document.getElementById('u957').addEventListener('click', (e)=>{
-            e.stopPropagation();
-            userMenu.classList.remove('active');
-            showModal(profilePanel);
+                e.stopPropagation();
+                userMenu.classList.remove('active');
+                showModal(profilePanel);
             });
 
-            // 关闭与保存
             document.getElementById('close-profile').addEventListener('click', hideModal);
             document.getElementById('save-profile').addEventListener('click', ()=>{
-            // 这里是演示，不做必填校验与持久化
-            hideModal();
-            alert('信息已保存');
+                hideModal();
+                alert('信息已保存');
             });
 
-            // 修改密码
             const passwordPanel = document.getElementById('password-panel');
             document.getElementById('u953').addEventListener('click', (e)=>{
-            e.stopPropagation();
-            userMenu.classList.remove('active');
-            showModal(passwordPanel);
+                e.stopPropagation();
+                userMenu.classList.remove('active');
+                showModal(passwordPanel);
             });
 
             document.getElementById('close-password').addEventListener('click', hideModal);
 
             document.getElementById('save-password').addEventListener('click', ()=>{
-            const oldP = document.getElementById('pwd-old').value;
-            const p1 = document.getElementById('pwd-new').value;
-            const p2 = document.getElementById('pwd-new2').value;
+                const oldP = document.getElementById('pwd-old').value;
+                const p1 = document.getElementById('pwd-new').value;
+                const p2 = document.getElementById('pwd-new2').value;
 
-            if(!oldP || !p1 || !p2){
-                alert('请完整填写三项');
-                return;
-            }
-            if(p1.length < 8){
-                alert('新密码至少 8 位');
-                return;
-            }
-            if(p1 !== p2){
-                alert('两次输入的新密码不一致');
-                return;
-            }
-            // 演示：不做真实校验与保存
-            hideModal();
-            alert('密码已修改!');
+                if(!oldP || !p1 || !p2){
+                    alert('请完整填写三项');
+                    return;
+                }
+                if(p1.length < 8){
+                    alert('新密码至少 8 位');
+                    return;
+                }
+                if(p1 !== p2){
+                    alert('两次输入的新密码不一致');
+                    return;
+                }
+                hideModal();
+                alert('密码已修改!');
             });
 
-            // 点击头像菜单里的「我的任务」跳转到新页面
             document.getElementById('u955').addEventListener('click', (e)=>{
-            e.stopPropagation();
-            userMenu.classList.remove('active');
-            window.location.href = '我的任务.html';
+                e.stopPropagation();
+                userMenu.classList.remove('active');
+                window.location.href = '我的任务.html';
+            });
+            
+            // --- Search Logic ---
+            const searchContainer = document.querySelector('.search-container');
+            const searchHeader = document.querySelector('.search-header');
+            const searchInput = document.getElementById('search-input');
+            const resetBtn = document.getElementById('reset-search-btn');
+            const cards = document.querySelectorAll('.card-container .card');
+            const noResultsMessage = document.getElementById('no-results-message');
+            const keywordBtns = document.querySelectorAll('.keyword-btn');
+
+            function filterCards() {
+                const query = searchInput.value.toLowerCase().trim();
+                let visibleCount = 0;
+
+                // Update active keyword button
+                let queryMatchesKeyword = false;
+                keywordBtns.forEach(btn => {
+                    if (btn.textContent.toLowerCase() === query) {
+                        btn.classList.add('active');
+                        queryMatchesKeyword = true;
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                if (!queryMatchesKeyword) {
+                     keywordBtns.forEach(btn => btn.classList.remove('active'));
+                }
+
+
+                cards.forEach(card => {
+                    const title = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+                    const tags = Array.from(card.querySelectorAll('.card-tag')).map(tag => tag.textContent.toLowerCase()).join(' ');
+                    
+                    const isVisible = title.includes(query) || tags.includes(query);
+                    
+                    card.style.display = isVisible ? 'flex' : 'none';
+                    if(isVisible) visibleCount++;
+                });
+
+                noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+            
+            // Toggle Search Area
+            if (searchHeader) {
+                searchHeader.addEventListener('click', () => {
+                    searchContainer.classList.toggle('collapsed');
+                });
+            }
+
+            searchInput.addEventListener('input', filterCards);
+
+            resetBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                filterCards();
             });
 
+            keywordBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    searchInput.value = btn.textContent;
+                    filterCards();
+                });
+            });
 
         });
     </script>

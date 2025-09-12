@@ -266,9 +266,9 @@
             <p>在给定结构的前提下，智能推荐少量点突变方案以提升序列热稳定性，替代“全量实验扫描”，显著缩小验证空间。</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div id="main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
 
-            <div class="lg:col-span-7 flex flex-col gap-8">
+            <div id="left-column" class="lg:col-span-7 flex flex-col gap-8 transition-all duration-500 ease-in-out">
                 <section class="content-card" id="input-parameters-section">
                     <nav class="tabs">
                         <button class="tab-link active" onclick="openTab(event, 'input-tab')">输入</button>
@@ -356,7 +356,13 @@
                 </section>
             </div>
 
-            <div class="lg:col-span-5">
+            <button id="collapse-btn" class="absolute top-1/2 right-[41.666667%] -translate-y-1/2 translate-x-1/2 z-30 bg-white hover:bg-cyan-500 text-cyan-600 hover:text-white rounded-full w-10 h-10 shadow-lg flex items-center justify-center transition-all duration-500 ease-in-out">
+                <svg id="collapse-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+
+            <div id="right-column" class="lg:col-span-5 transition-all duration-500 ease-in-out">
                 <div class="sticky top-28 flex flex-col gap-8">
                     <section id="details-section" class="content-card">
                         <nav class="tabs">
@@ -640,7 +646,26 @@ GITLTQADNPSLIKKELVKMVQDVLRPAWIELVS`;
         document.addEventListener('DOMContentLoaded', () => {
             toggleModeInputs();
         });
+
+        // --- 折叠逻辑 ---
+        const collapseBtn = document.getElementById('collapse-btn');
+        const collapseIcon = document.getElementById('collapse-icon');
+        const leftColumn = document.getElementById('left-column');
+        const rightColumn = document.getElementById('right-column');
+
+        collapseBtn.addEventListener('click', () => {
+            // 切换左侧栏的宽度
+            leftColumn.classList.toggle('lg:col-span-7');
+            leftColumn.classList.toggle('lg:col-span-12');
+
+            // 切换右侧栏的可见性
+            rightColumn.classList.toggle('hidden');
+
+            // 切换按钮的位置和图标方向
+            collapseBtn.classList.toggle('right-[41.666667%]'); // 展开时的位置 (5/12)
+            collapseBtn.classList.toggle('right-0'); // 折叠时的位置
+            collapseIcon.classList.toggle('rotate-180');
+        });
     </script>
 </body>
 </html>
-
