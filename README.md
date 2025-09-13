@@ -1,4 +1,4 @@
-<img width="2235" height="270" alt="image" src="https://github.com/user-attachments/assets/4aaff1a0-39bb-4370-9678-4a913417ce42" /># 更新日志 (Changelog)
+# 更新日志 (Changelog)
 
 
 ## 2025-09-12 · Asia/China
@@ -34,4 +34,5 @@
 
 ### 优化
 - 统一模态框切换逻辑：打开任一面板前会自动隐藏其他面板，避免多个面板同时显示。
+
 
