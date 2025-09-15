@@ -235,11 +235,7 @@
                     <!-- 输入 Tab -->
                     <div id="input-tab" class="tab-content active">
                         <div class="form-group">
-                            <label for="pdb-input" class="form-label">输入蛋白质PDB结构文本</label>
-                            <textarea id="pdb-input" class="form-textarea" placeholder="请在此处粘贴PDB格式的文本..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">或上传PDB文件</label>
+                            <label class="form-label">上传PDB文件</label>
                             <div class="upload-area">
                                 <button class="upload-btn" onclick="document.getElementById('file-upload').click();">选择文件</button>
                                 <span id="file-name">未选择任何文件</span>
@@ -458,7 +454,8 @@
         const clearBtn = document.getElementById('clear-btn');
         const outputSection = document.getElementById('output-section');
         clearBtn.addEventListener('click', () => {
-            document.getElementById('pdb-input').value = '';
+            // 移除pdb-input的清空逻辑
+            // document.getElementById('pdb-input').value = ''; 
             fileUpload.value = '';
             fileNameSpan.textContent = '未选择任何文件';
             // Reset params

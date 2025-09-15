@@ -409,8 +409,42 @@
                      <h2>结果预览</h2>
                      <p>检索完成！以下是匹配得分最高的前50个结果。您可以下载完整CSV文件或复制预览表格。</p>
                      <div class="output-actions"><button class="btn btn-primary text-sm px-4 py-2">下载结果 (.csv)</button><button class="btn btn-secondary text-sm px-4 py-2 bg-gray-600">复制预览</button></div>
-                     <div class="output-table-wrapper mt-4"><table class="output-table"><thead><tr><th>输入查询蛋白名称</th><th>匹配到的蛋白ID</th><th>匹配分数</th><th>匹配到的蛋白的序列</th><th>匹配到的蛋白的名称</th></tr></thead><tbody><tr><td>Protein_A</td><td>WP_12345678.1</td><td>0.987</td><td class="font-mono text-xs truncate max-w-xs">MKLILNGKTLKGETTTEAVDAAT...</td><td>hypothetical protein [Lactobacillus]</td></tr><tr><td>Protein_A</td><td>WP_98765432.1</td><td>0.985</td><td class="font-mono text-xs truncate max-w-xs">MQYKLILNGKTLKGETTTEAVDA...</td><td>putative membrane protein [Bacillus]</td></tr><tr><td>Protein_A</td><td>XP_00123456.1</td><td>0.982</td><td class="font-mono text-xs truncate max-w-xs">MTYKLILNGKTLKGETTTEAVDA...</td><td>conserved protein [Streptococcus]</td></tr></tbody></table></div>
-                </section>
+                     <!-- <div class="output-table-wrapper mt-4"><table class="output-table"><thead><tr><th>输入查询蛋白名称</th><th>匹配到的蛋白ID</th><th>匹配分数</th><th>匹配到的蛋白的序列</th><th>匹配到的蛋白的名称</th></tr></thead><tbody><tr><td>Protein_A</td><td>WP_12345678.1</td><td>0.987</td><td class="font-mono text-xs truncate max-w-xs">MKLILNGKTLKGETTTEAVDAAT...</td><td>hypothetical protein [Lactobacillus]</td></tr><tr><td>Protein_A</td><td>WP_98765432.1</td><td>0.985</td><td class="font-mono text-xs truncate max-w-xs">MQYKLILNGKTLKGETTTEAVDA...</td><td>putative membrane protein [Bacillus]</td></tr><tr><td>Protein_A</td><td>XP_00123456.1</td><td>0.982</td><td class="font-mono text-xs truncate max-w-xs">MTYKLILNGKTLKGETTTEAVDA...</td><td>conserved protein [Streptococcus]</td></tr></tbody></table></div> -->
+                
+                     <div class="output-table-wrapper mt-4">
+                        <table class="output-table">
+                          <thead>
+                            <tr>
+                              <th>输入查询蛋白名称</th>
+                              <th>匹配到的蛋白ID</th>
+                              <th>匹配分数</th>
+                              <th>匹配到的蛋白的序列</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Protein_A</td>
+                              <td>WP_12345678.1</td>
+                              <td>0.987</td>
+                              <td class="font-mono text-xs truncate max-w-xs">MKLILNGKTLKGETTTEAVDAAT...</td>
+                            </tr>
+                            <tr>
+                              <td>Protein_A</td>
+                              <td>WP_98765432.1</td>
+                              <td>0.985</td>
+                              <td class="font-mono text-xs truncate max-w-xs">MQYKLILNGKTLKGETTTEAVDA...</td>
+                            </tr>
+                            <tr>
+                              <td>Protein_A</td>
+                              <td>XP_00123456.1</td>
+                              <td>0.982</td>
+                              <td class="font-mono text-xs truncate max-w-xs">MTYKLILNGKTLKGETTTEAVDA...</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                
+                    </section>
             </div>
              <!-- 修改点 2: 将折叠按钮移到左侧栏，并用绝对定位放置在两栏中间 -->
              <button id="collapse-btn" class="absolute top-1/2 right-[41.666667%] -translate-y-1/2 translate-x-1/2 z-30 bg-white hover:bg-cyan-500 text-cyan-600 hover:text-white rounded-full w-10 h-10 shadow-lg flex items-center justify-center transition-all duration-500 ease-in-out">

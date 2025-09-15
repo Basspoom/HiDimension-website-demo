@@ -40,6 +40,32 @@
     td a{color:var(--primary-color);text-decoration:none}
     .empty{padding:36px;text-align:center;color:#6c757d}
     .hint{margin-top:10px;color:#6c757d;font-size:12px}
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .pagination button {
+        padding: 8px 12px;
+        border: 1px solid #dde1e6;
+        background-color: #fff;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .pagination button:hover:not(:disabled) {
+        background-color: #e9ecef;
+    }
+    .pagination button:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+    .pagination-info {
+        font-size: 14px;
+        color: #555;
+    }
   </style>
 </head>
 <body>
@@ -72,46 +98,129 @@
             </tr>
           </thead>
           <tbody>
-            <!-- 仅示例数据，可按需替换为真实列表 -->
-            <tr>
-              <td>蛋白质低同源检索</td>
-              <td>2025-09-01 10:25:20</td>
-              <td>2025-09-01 10:25:40</td>
-              <td><a href="javascript:void(0)">查看</a></td>
-            </tr>
-            <tr>
-              <td>蛋白质结构补齐</td>
-              <td>2025-09-01 10:25:20</td>
-              <td>2025-09-01 10:25:40</td>
-              <td><a href="javascript:void(0)">查看</a></td>
-            </tr>
+            <!-- 示例数据，已增加更多条目 -->
           </tbody>
         </table>
         <div id="empty" class="empty" style="display:none">未找到匹配的任务</div>
         <div class="hint">提示：当前为演示数据，后续可以替换为真实接口返回的列表。</div>
       </div>
+      
+      <div id="pagination" class="pagination">
+        <button id="prevBtn">&laquo; 上一页</button>
+        <span id="pageInfo" class="pagination-info"></span>
+        <button id="nextBtn">下一页 &raquo;</button>
+      </div>
     </div>
   </div>
 
   <script>
-    function doSearch(){
-      const q = document.getElementById('q').value.trim().toLowerCase();
-      const rows = [...document.querySelectorAll('#taskTable tbody tr')];
-      let shown = 0;
-      rows.forEach(tr=>{
-        const text = tr.innerText.toLowerCase();
-        const hit = !q || text.includes(q);
-        tr.style.display = hit ? '' : 'none';
-        if(hit) shown++;
+    const allTasks = [
+      { type: '蛋白质低同源检索', submitTime: '2025-09-15 10:25:20', finishTime: '2025-09-15 10:25:40' },
+      { type: '蛋白质结构补齐', submitTime: '2025-09-14 11:30:10', finishTime: '2025-09-14 11:31:05' },
+      { type: '蛋白质序列设计', submitTime: '2025-09-13 14:00:55', finishTime: '2025-09-13 14:02:12' },
+      { type: '蛋白质热稳定性优化', submitTime: '2025-09-12 09:45:01', finishTime: '2025-09-12 09:47:33' },
+      { type: '密码子优化', submitTime: '2025-09-11 16:20:30', finishTime: '2025-09-11 16:21:45' },
+      { type: '蛋白质低同源检索', submitTime: '2025-09-10 08:15:18', finishTime: '2025-09-10 08:15:58' },
+      { type: '蛋白质结构补齐', submitTime: '2025-09-09 13:00:00', finishTime: '2025-09-09 13:01:22' },
+      { type: '蛋白质序列设计', submitTime: '2025-09-08 17:50:40', finishTime: '2025-09-08 17:52:10' },
+      { type: '蛋白质结构预测', submitTime: '2025-09-07 10:05:00', finishTime: '2025-09-07 10:08:45' },
+      { type: '密码子优化', submitTime: '2025-09-06 11:22:30', finishTime: '2025-09-06 11:23:40' },
+      { type: '蛋白质低同源检索', submitTime: '2025-09-05 14:35:10', finishTime: '2025-09-05 14:35:55' },
+      { type: '蛋白质结构补齐', submitTime: '2025-09-04 09:10:20', finishTime: '2025-09-04 09:11:00' },
+      { type: '蛋白质序列设计', submitTime: '2025-09-03 18:00:00', finishTime: '2025-09-03 18:01:30' },
+      { type: '蛋白质热稳定性优化', submitTime: '2025-09-02 12:40:05', finishTime: '2025-09-02 12:43:15' },
+      { type: '密码子优化', submitTime: '2025-09-01 10:25:20', finishTime: '2025-09-01 10:25:40' },
+      { type: '蛋白质低同源检索', submitTime: '2025-08-30 15:50:10', finishTime: '2025-08-30 15:50:50' },
+      { type: '蛋白质结构补齐', submitTime: '2025-08-29 11:00:00', finishTime: '2025-08-29 11:01:10' },
+      { type: '蛋白质序列设计', submitTime: '2025-08-28 17:00:20', finishTime: '2025-08-28 17:01:50' },
+      { type: '蛋白质结构预测', submitTime: '2025-08-27 09:30:00', finishTime: '2025-08-27 09:33:00' },
+      { type: '密码子优化', submitTime: '2025-08-26 14:15:10', finishTime: '2025-08-26 14:16:20' },
+      { type: '蛋白质低同源检索', submitTime: '2025-08-25 10:20:00', finishTime: '2025-08-25 10:20:30' },
+      { type: '蛋白质结构补齐', submitTime: '2025-08-24 16:45:00', finishTime: '2025-08-24 16:46:15' },
+      { type: '蛋白质序列设计', submitTime: '2025-08-23 11:05:00', finishTime: '2025-08-23 11:06:20' },
+      { type: '蛋白质热稳定性优化', submitTime: '2025-08-22 13:55:00', finishTime: '2025-08-22 13:58:30' },
+      { type: '密码子优化', submitTime: '2025-08-21 09:00:00', finishTime: '2025-08-21 09:01:10' }
+    ];
+
+    const tasksPerPage = 10;
+    let currentPage = 1;
+    let filteredTasks = allTasks;
+
+    const taskTableBody = document.querySelector('#taskTable tbody');
+    const pageInfoSpan = document.getElementById('pageInfo');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const emptyMessage = document.getElementById('empty');
+
+    function renderTable() {
+      taskTableBody.innerHTML = '';
+      if (filteredTasks.length === 0) {
+        emptyMessage.style.display = 'block';
+        pageInfoSpan.textContent = '0/0';
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        return;
+      }
+
+      emptyMessage.style.display = 'none';
+      const start = (currentPage - 1) * tasksPerPage;
+      const end = start + tasksPerPage;
+      const tasksToRender = filteredTasks.slice(start, end);
+
+      tasksToRender.forEach(task => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${task.type}</td>
+          <td>${task.submitTime}</td>
+          <td>${task.finishTime}</td>
+          <td><a href="javascript:void(0)">查看</a></td>
+        `;
+        taskTableBody.appendChild(row);
       });
-      document.getElementById('empty').style.display = shown? 'none':'block';
+
+      updatePagination();
     }
-    function resetSearch(){
+
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
+      pageInfoSpan.textContent = `第 ${currentPage} 页 / 共 ${totalPages} 页`;
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage >= totalPages;
+    }
+
+    function doSearch() {
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      filteredTasks = allTasks.filter(task => 
+        task.type.toLowerCase().includes(q) || 
+        task.submitTime.toLowerCase().includes(q)
+      );
+      currentPage = 1;
+      renderTable();
+    }
+
+    function resetSearch() {
       document.getElementById('q').value = '';
-      doSearch();
+      filteredTasks = allTasks;
+      currentPage = 1;
+      renderTable();
     }
-    // 初始一次
-    doSearch();
+    
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentPage * tasksPerPage < filteredTasks.length) {
+        currentPage++;
+        renderTable();
+      }
+    });
+
+    // 初始加载
+    renderTable();
   </script>
 </body>
 </html>

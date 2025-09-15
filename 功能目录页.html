@@ -47,12 +47,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 40px;
+            padding: 0 20px; /* Adjusted padding */
             box-sizing: border-box;
         }
         #u959_img { /* Logo */
-            height: 40px;
-            width: auto;
+            height: 60px;
+            width: 240px; /* Adjusted the logo width */
+            object-fit: contain;
         }
         #u950 { /* 应用 标题 */
             font-size: 24px;
@@ -97,6 +98,7 @@
         .search-container {
             background-color: #eaf0f6;
             padding: 20px 40px;
+            max-width: 100%;
         }
         
         .search-header {
@@ -254,10 +256,9 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
             gap: 40px;
-            width: 100%;
-            max-width: 1400px;
+            width: 90%; /* Adjusted width */
             margin: 0 auto; /* 居中显示 */
-            padding: 40px;
+            padding: 40px 0; /* Adjusted padding */
         }
 
         /* --- 单个卡片样式 --- */
@@ -409,9 +410,17 @@
             position: relative;
             transform: scale(0.95);
             transition: transform 0.3s ease;
+            max-height: 90vh; /* Add this */
+            overflow-y: auto; /* Add this */
         }
         .modal-overlay.active .modal-container {
              transform: scale(1);
+        }
+
+        /* 针对隐私政策和免责声明面板，放宽宽度 */
+        #privacy-policy-panel,
+        #disclaimer-panel {
+             max-width: 800px;
         }
 
         .modal-close-btn {
@@ -519,11 +528,39 @@
             text-align: center;
         }
 
+        /* Checkbox styling */
+        .agreement-container {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+        .agreement-container input[type="checkbox"] {
+            margin-top: 2px;
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .agreement-container a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid var(--primary-color);
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .agreement-container a:hover {
+            color: #138496;
+            border-color: #138496;
+        }
+
         /* 用户信息下拉菜单 */
         #u951 {
             position: absolute;
             top: 70px;
-            right: 40px;
+            right: 20px; /* Adjusted right position */
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 5px 25px rgba(0,0,0,0.1);
@@ -569,6 +606,10 @@
         /* 响应式调整 */
         @media (max-width: 992px) {
             .card-container { gap: 30px; }
+            #privacy-policy-panel,
+            #disclaimer-panel {
+                max-width: 90%;
+            }
         }
         
         @media (max-width: 768px) {
@@ -580,8 +621,22 @@
             .card-content { padding: 25px; }
             #u831 { padding: 0 20px; }
             #u950 { display: none; }
+            #privacy-policy-panel,
+            #disclaimer-panel {
+                max-width: 95%;
+            }
         }
-
+        
+        .modal-content-scroll {
+            max-height: 70vh;
+            overflow-y: auto;
+            line-height: 1.8;
+            padding-right: 10px; /* For scrollbar space */
+        }
+        .modal-content-scroll p,
+        .modal-content-scroll li {
+            font-size: 14px;
+        }
 		#u959_img {
 			cursor: pointer;
 		}
@@ -591,7 +646,7 @@
 <body>
 
     <div id="u831">
-        <img id="u959_img" src="images/首页/u108.png" alt="Logo" style="width: 240px; height: 60px;">
+        <img id="u959_img" src="images/首页/u108.png" alt="Logo" onerror="this.onerror=null;this.src='https://placehold.co/180x60/17a2b8/FFFFFF?text=H+Logo';">
         <div id="u950"></div>
         <div class="header-right">
             <div id="u833" data-label="登录按钮">登录</div>
@@ -801,7 +856,13 @@
                  <label for="register-password">密码*</label>
                  <input type="password" id="register-password" placeholder="请输入您的密码">
              </div>
-             <button class="submit-btn">注册</button>
+             <div class="agreement-container">
+                <input type="checkbox" id="agreement-checkbox">
+                <label for="agreement-checkbox">
+                    我已阅读并同意<a href="#" class="privacy-link">《隐私政策》</a>和<a href="#" class="disclaimer-link">《免责声明》</a>，并同意按政策约定处理我的个人信息与用户内容。
+                </label>
+            </div>
+             <button class="submit-btn" id="register-btn">注册</button>
              <div class="form-divider"></div>
              <p class="switch-form-text">已有账户？ <span id="show-login-link" class="form-link">立即登录</span></p>
         </div>
@@ -812,7 +873,7 @@
                  <label for="forgot-email">邮箱地址</label>
                  <input type="email" id="forgot-email" placeholder="请输入您的注册邮箱">
              </div>
-             <button class="submit-btn">发送重置链接</button>
+             <button class="submit-btn" id="send-reset-btn">发送重置链接</button>
              <div class="form-divider"></div>
              <p class="switch-form-text"><span id="back-to-login-link" class="form-link">返回登录</span></p>
         </div>
@@ -892,7 +953,123 @@
         
             <button id="save-password" class="submit-btn">确认修改</button>
         </div>
- 
+
+        <!-- 隐私政策面板 -->
+        <div id="privacy-policy-panel" class="modal-container" style="display:none;">
+            <button id="close-privacy-policy" class="modal-close-btn">&times;</button>
+            <h2 class="modal-title">隐私政策</h2>
+            <div class="modal-content-scroll">
+                <p><strong>版本：v1.0</strong></p>
+                <p><strong>生效日期：2025年9月15日</strong></p>
+                <p><strong>适用主体：</strong>合肥塰维生物科技有限公司（简称“我们”或“本公司”）</p>
+                <p><strong>适用范围：</strong>本政策适用于我们提供的网站、网页应用、接口与相关在线服务（统称“本服务”）</p>
+                <h3>一、我们如何收集和使用你的信息</h3>
+                <p>我们仅为以下目的收集与使用个人信息和业务数据。</p>
+                <ul>
+                    <li><strong>账号注册与登录。</strong>用于创建账号、身份核验与登录安全。收集信息包括昵称、邮箱或手机号、密码凭证、验证码。</li>
+                    <li><strong>任务提交与结果交付。</strong>用于运行算法、生成与返回结果。你可能上传序列、结构文件、任务参数、备注等业务数据，我们视其为你的“用户内容”。</li>
+                    <li><strong>客服与技术支持。</strong>用于处理咨询与故障排查。可能记录工单、聊天记录、错误日志与相关元数据。</li>
+                    <li><strong>安全与合规。</strong>用于防范攻击、审计追踪、风控合规模块。可能处理访问日志、设备信息、IP、时间戳等。</li>
+                    <li><strong>站点分析与改进。</strong>用于统计访问与功能使用，若使用 Cookies 或同类技术，会在首次使用时告知并征求同意。</li>
+                    <li>法律要求或履行合同所必需的其他场景。</li>
+                </ul>
+                <h3>二、我们处理的典型数据类型</h3>
+                <ul>
+                    <li><strong>身份信息。</strong>邮箱或手机号、用户名、头像。</li>
+                    <li><strong>业务数据。</strong>你上传的生物序列、结构文件、参数设置、任务元数据、结果文件。</li>
+                    <li><strong>设备与日志信息。</strong>浏览器类型、操作系统、IP、访问时间、页面停留、错误日志与性能指标。</li>
+                    <li><strong>Cookies 与同类技术。</strong>会话保持、偏好设置、统计分析。</li>
+                </ul>
+                <h3>三、我们如何共享、转移与公开披露</h3>
+                <p><strong>共享。</strong>仅在下列情况下共享：</p>
+                <ul>
+                    <li>为实现服务必要与经你同意的第三方基础设施与分析服务商。</li>
+                    <li>法律法规要求、行政或司法部门要求时。</li>
+                </ul>
+                <p><strong>转移。</strong>若发生合并、分立、重组、资产或业务转让，我们会要求受让方继续受本政策约束，或重新征得你的同意。</p>
+                <p><strong>公开披露。</strong>除法律规定或经你明确同意，我们不会公开披露你的个人信息或用户内容。</p>
+                <h3>四、用户内容与保密</h3>
+                <p>用户内容包括你上传或生成的序列、结构、任务配置与结果文件。默认仅用于为你提供本服务。</p>
+                <p>未经你的明确书面同意，我们不将可识别的用户内容用于对外展示或商业宣传。</p>
+                <p>为算法优化与科研统计，我们可能对数据进行去标识化与聚合处理，此类数据不指向个人或特定主体。若涉及可识别信息，事先征求你的同意并提供退出方式。</p>
+                <h3>五、数据存储与跨境传输</h3>
+                <p><strong>数据存储。</strong>数据托管于合规的云服务商数据中心，具备访问控制、加密与备份机制。</p>
+                <p><strong>保留期限。</strong>账户信息在你账户存续期间保留，任务数据默认保留不少于三十天以便复现，你可随时在“我的任务”中删除或联系我们删除。为符合法律要求与审计，我们可能在合理期限内保留必要日志。</p>
+                <p><strong>跨境传输。</strong>若因服务需要进行跨境传输，我们会采取必要的安全措施，并在法律要求的情况下另行征得你的同意。</p>
+                <h3>六、你的权利</h3>
+                <ul>
+                    <li><strong>访问与更正。</strong>你可以在账户设置中查询与更正个人资料。</li>
+                    <li><strong>删除。</strong>你可以删除任务与结果，或申请我们删除相关个人信息或用户内容。</li>
+                    <li><strong>撤回同意。</strong>你可随时撤回基于同意的处理，可能影响相应功能的使用。</li>
+                    <li><strong>账号注销。</strong>提交注销后，我们将删除或匿名化处理与你账号相关的个人信息，法律另有规定的除外。</li>
+                    <li><strong>获取副本与数据迁移。</strong>在可行范围内我们提供导出功能或合理协助。</li>
+                </ul>
+                <h3>七、未成年人保护</h3>
+                <p>我们不面向十四周岁以下未成年人提供单独服务。若你为未成年人，请在监护人同意与指导下使用，并通过监护人联系方式提交信息主体请求。</p>
+                <h3>八、信息安全</h3>
+                <p>我们采取加密、访问控制、最小权限、审计与备份等措施保护信息安全。你应妥善保管账号与凭证，并避免在公共设备保存敏感信息。</p>
+                <h3>九、第三方服务</h3>
+                <p>本服务可能集成第三方组件、库或链接。第三方处理行为受其各自隐私政策约束。请在使用前阅读并自行判断是否接受。</p>
+                <h3>十、政策更新</h3>
+                <p>为适应服务变更或法律要求，我们可能更新本政策。重要变更将通过站内提示或邮件通知，并在合理期限内生效。</p>
+                <h3>十一、联系我们</h3>
+                <p>若你对本政策或个人信息保护有任何疑问、投诉与建议，请联系：</p>
+                <p>公司名称：合肥塰维生物科技有限公司</p>
+                <p>联系邮箱：privacy@hidimension.example</p>
+                <p>联系地址：安徽省合肥市高新区长宁社区服务中心习友路333号中国（合肥）国际智能语音产业园8号楼1201室</p>
+            </div>
+        </div>
+
+        <!-- 免责声明面板 -->
+        <div id="disclaimer-panel" class="modal-container" style="display:none;">
+            <button id="close-disclaimer" class="modal-close-btn">&times;</button>
+            <h2 class="modal-title">免责声明</h2>
+            <div class="modal-content-scroll">
+                <p><strong>版本：v1.0</strong></p>
+                <p><strong>生效日期：2025年9月15日</strong></p>
+                <h3>一、服务性质</h3>
+                <p>本服务为科研与工程应用提供算法与工具，输出包括但不限于序列检索、结构预测、结构补齐、热稳定性评估与优化建议。</p>
+                <p>模型输出属于基于统计与机器学习的估计结果，仅供研究参考与预评估，不构成医学诊断、临床决策、治疗建议、药审申报依据，亦不构成任何形式的法律或投资意见。若需用于临床或生产，请进行独立的实验与合规验证。</p>
+                <h3>二、用户义务</h3>
+                <p>你保证对上传的数据享有合法权限，包括取得必要授权与不侵犯第三方权益。</p>
+                <p>你承诺不上传违法违规内容，不上传受严格监管的个人敏感信息与健康医疗数据，若确需处理此类数据，应在取得充分授权与满足合规前提后再行提交。</p>
+                <p>你应对使用结果的解读与后续决策独立负责，并在必要时开展实验复核与风险评估。</p>
+                <h3>三、结果准确性与可用性</h3>
+                <p>我们将持续改进算法，但不保证结果的完全准确、完整与实时性，输出可能受数据质量、参数选择与计算资源的影响。</p>
+                <p>服务可能因系统维护、网络波动或不可抗力出现中断或延迟，我们不对由此造成的直接或间接损失承担责任。</p>
+                <h3>四、第三方与链接</h3>
+                <p>本服务可能包含第三方工具、库或外部链接，相关内容与行为由该第三方承担责任。你应遵守第三方条款与政策。</p>
+                <h3>五、知识产权</h3>
+                <p>本服务的软件、页面、模型与文档等由我们或相应权利人享有知识产权。未经书面许可，不得复制、修改、传播或用于超出授权范围的用途。</p>
+                <p>你对依法享有权利的用户内容保留权利。为实现服务之目的，你授予我们在服务期限内的非独占、可撤回、免许可费的处理许可。</p>
+                <h3>六、责任限制</h3>
+                <p>在法律允许的最大范围内，对于使用或无法使用本服务导致的利润、商誉、数据或其他间接损失，我们不承担任何责任。对于可直接归责于我们的损失，赔偿总额以你在前十二个月为本服务实际支付的费用为上限，免费用户的上限为零元。</p>
+                <h3>七、出口管制与合规</h3>
+                <p>你应遵守适用的出口管制、贸易制裁与数据合规法律，不得将本服务用于被禁止的国家、实体或用途。</p>
+                <h3>八、变更与终止</h3>
+                <p>我们保留根据实际情况调整、暂停或终止服务的权利，会通过站内通知或邮件进行合理告知。你可以随时停止使用或申请注销账户。</p>
+                <h3>九、适用法律与争议解决</h3>
+                <p>本免责声明的订立、执行与解释适用中华人民共和国法律。争议发生时，双方应友好协商解决；协商不成的，提交我们所在地有管辖权的人民法院诉讼解决。</p>
+                <h3>十、联系方式</h3>
+                <p>公司名称：合肥塰维生物科技有限公司</p>
+                <p>联系邮箱：legal@hidimension.example</p>
+            </div>
+        </div>
+
+        <!-- 新增：邮件提示面板 -->
+        <div id="email-prompt-panel" class="modal-container" style="display:none;">
+            <button id="close-email-prompt" class="modal-close-btn">&times;</button>
+            <h2 class="modal-title">请查收您的邮箱</h2>
+            <div style="text-align: center; font-size: 16px; color: #555; line-height: 1.7;">
+                <p>我们已向您的邮箱地址发送了一封验证邮件，请点击邮件中的链接完成操作。</p>
+                <p>如果您未收到邮件，请检查您的垃圾邮件文件夹，或稍后重试。</p>
+                <div style="margin-top: 20px;">
+                    <a href="https://mail.google.com" target="_blank" class="form-link" style="text-decoration: none; font-size: 16px;">前往邮箱查收 &rarr;</a>
+                </div>
+            </div>
+            <button id="close-email-prompt-btn" class="submit-btn" style="margin-top: 30px;">关闭</button>
+        </div>
+
     </div>
 
 
@@ -909,6 +1086,9 @@
             const forgotPasswordPanel = document.getElementById('forgot-password-panel');
             const wishPanel = document.getElementById('wish-panel'); 
             const thankYouPanel = document.getElementById('thank-you-panel'); 
+            const privacyPolicyPanel = document.getElementById('privacy-policy-panel');
+            const disclaimerPanel = document.getElementById('disclaimer-panel');
+            const emailPromptPanel = document.getElementById('email-prompt-panel');
             
             // --- 获取功能许愿卡片 ---
             const featureWishCard = document.getElementById('feature-wish-card'); 
@@ -977,6 +1157,18 @@
             
             featureWishCard.addEventListener('click', () => showModal(wishPanel));
 
+            // Show privacy policy and disclaimer panels
+            document.querySelector('.privacy-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showModal(privacyPolicyPanel);
+            });
+
+            document.querySelector('.disclaimer-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showModal(disclaimerPanel);
+            });
+
+
             document.getElementById('submit-wish-btn').addEventListener('click', function() {
                 showModal(thankYouPanel); 
             });
@@ -986,6 +1178,12 @@
             document.getElementById('close-forgot').addEventListener('click', hideModal);
             document.getElementById('close-wish').addEventListener('click', hideModal);
             document.getElementById('close-thank-you-btn').addEventListener('click', hideModal);
+            document.getElementById('close-email-prompt').addEventListener('click', hideModal);
+            document.getElementById('close-email-prompt-btn').addEventListener('click', hideModal);
+
+            // Modified close handlers to go back to register panel
+            document.getElementById('close-privacy-policy').addEventListener('click', () => showModal(registerPanel));
+            document.getElementById('close-disclaimer').addEventListener('click', () => showModal(registerPanel));
 
             modalOverlay.addEventListener('click', function(event) {
                 if (event.target === modalOverlay) {
@@ -994,8 +1192,26 @@
             });
 
             loginPanel.querySelector('.submit-btn').addEventListener('click', function(){
-                hideModal();
-                toggleLoginState();
+                // hideModal();
+                showModal(emailPromptPanel); // Show email prompt after simulated login
+            });
+
+            // Register button logic
+            document.getElementById('register-btn').addEventListener('click', function(e) {
+                const agreementCheckbox = document.getElementById('agreement-checkbox');
+                if (!agreementCheckbox.checked) {
+                    alert('请先阅读并同意隐私政策和免责声明');
+                    e.preventDefault();
+                    return;
+                }
+                // Here you would add the actual registration logic
+                // hideModal();
+                showModal(emailPromptPanel); // Show email prompt after simulated registration
+            });
+
+            // Forgot password logic
+            document.getElementById('send-reset-btn').addEventListener('click', () => {
+                showModal(emailPromptPanel); // Show email prompt after simulated reset
             });
 
             userAvatar.addEventListener('click', function(event) {

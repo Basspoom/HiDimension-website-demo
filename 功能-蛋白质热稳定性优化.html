@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <title>功能详情页 - 蛋白质热稳定性优化</title>
+    <title>功能详情页 - 蛋白质序列设计</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* --- 沿用功能目录页的全局样式和变量 --- */
         :root {
             --primary-color: #17a2b8;
             --background-color: #f4f7fa;
@@ -24,9 +25,10 @@
             font-family: 'Inter', 'Noto Sans SC', sans-serif;
             background-color: var(--background-color);
             margin: 0;
-            padding-top: 80px;
+            padding-top: 80px; /* 为固定的header留出空间 */
         }
         
+        /* --- 顶部导航/Header --- */
         #header-nav {
             position: fixed;
             top: 0;
@@ -42,7 +44,10 @@
             padding: 0 40px;
             box-sizing: border-box;
         }
-        
+        #logo-img {
+            height: 40px;
+            width: auto;
+        }
         .header-title {
             font-size: 24px;
             font-weight: 700;
@@ -52,6 +57,7 @@
             transform: translateX(-50%);
         }
 
+        /* --- 主内容区 --- */
         .main-container {
             max-width: 1440px;
             margin: 40px auto;
@@ -103,6 +109,7 @@
             color: var(--text-color);
         }
 
+        /* --- Tab 样式 --- */
         .tabs {
             display: flex;
             gap: 5px;
@@ -126,13 +133,14 @@
             border-bottom-color: var(--primary-color);
         }
         
-        .tab-content, .detail-tab-content, .output-tab-content { display: none; }
-        .tab-content.active, .detail-tab-content.active, .output-tab-content.active { display: block; animation: fadeIn 0.5s; }
+        .tab-content, .detail-tab-content { display: none; }
+        .tab-content.active, .detail-tab-content.active { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* --- 表单元素样式 --- */
         .form-group { margin-bottom: 25px; }
         .form-label {
             display: block;
@@ -140,24 +148,20 @@
             margin-bottom: 10px;
             color: #495057;
         }
-        .form-input, .form-textarea {
+        .form-input, .form-select, .form-textarea {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 16px;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .form-textarea {
-            min-height: 150px; 
-            resize: vertical; 
-            font-family: 'Courier New', Courier, monospace;
-        }
-        .form-input:focus, .form-textarea:focus {
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
         }
+        .form-textarea { min-height: 200px; resize: vertical; font-family: 'Courier New', Courier, monospace; }
         .upload-area { display: flex; align-items: center; gap: 15px; }
         .upload-btn {
             padding: 12px 20px; background-color: #e9ecef; color: #495057;
@@ -165,12 +169,8 @@
             cursor: pointer; font-weight: 600; transition: all 0.2s;
         }
         .upload-btn:hover { background-color: #d8dde2; }
-        
-        .param-option-group { display: flex; flex-direction: column; gap: 15px; }
-        .param-option-group label { display: flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; }
-        .param-option-group .form-input { margin-top: 5px; }
 
-
+        /* --- 按钮样式 --- */
         .action-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 40px; }
         .btn { padding: 15px 40px; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; border: none; transition: all 0.3s ease; }
         .btn-primary { background-color: var(--primary-color); color: white; box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3); }
@@ -178,7 +178,12 @@
         .btn-secondary { background-color: #6c757d; color: white; }
         .btn-secondary:hover { background-color: #5a6268; }
 
-        .output-actions { margin-top: 25px; display: flex; gap: 15px; }
+        /* --- 参数选项样式 --- */
+        .param-option-group { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+        .param-option-group label { display: flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; }
+        .param-section { border-left: 3px solid #e0e8f0; padding-left: 20px; margin-top: 20px; }
+
+        /* --- 输出区域 --- */
         #output-fasta {
             background-color: #f8f9fa;
             border: 1px solid var(--border-color);
@@ -191,69 +196,18 @@
             font-size: 14px;
             line-height: 1.6;
         }
-        
-        /* --- 比对样式优化 --- */
-        .alignment-view {
-            background-color: #f8f9fa;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            line-height: 1.8;
-            overflow-x: auto;
-        }
-        .alignment-block:not(:last-child) {
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-        .alignment-header {
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 1rem;
-            color: var(--text-color);
-        }
-        .alignment-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-        }
-        .alignment-table td {
-            padding: 2px 0;
-            vertical-align: middle;
-        }
-        .alignment-table .label-col {
-            width: 50px;
-            font-weight: bold;
-            color: var(--subtle-text-color);
-            padding-right: 10px;
-        }
-        .alignment-table .seq-col {
-            letter-spacing: 0.2em; /* Increase spacing for clarity */
-            white-space: pre;
-        }
-        .mutated {
-            background-color: #fecaca; /* red-200 */
-            color: #b91c1c; /* red-700 */
-            font-weight: bold;
-            border-radius: 3px;
-        }
-        .unchanged {
-            color: #374151; /* gray-700, more readable */
-        }
-        .ruler-line {
-            color: var(--subtle-text-color);
-        }
-
+        .output-actions { margin-top: 25px; display: flex; gap: 15px; }
     </style>
 </head>
 <body>
 
+    <!-- 顶部导航栏 -->
     <header id="header-nav">
-        <a href="首页.html"><img src="images/首页/u108.png" alt="Logo" style="width: 240px; height: 60px;"></a>
-        <div class="header-title">蛋白质热稳定性优化 - 功能详情</div>
+        <a href="首页.html"><img id="logo-img" src="images/首页/u108.png" alt="Logo"  style="width: 240px; height: 60px;"></a>
+        <div class="header-title">蛋白质序列设计 - 功能详情</div>
     </header>
 
+    <!-- 主内容区 -->
     <div class="main-container">
         <div class="mb-6">
             <a href="功能目录页.html" class="text-sm font-medium text-cyan-700 hover:text-cyan-900 transition-colors duration-200 flex items-center gap-2">
@@ -261,370 +215,325 @@
                 回到功能目录
             </a>
         </div>
+        <!-- 页面标题介绍 -->
         <header class="page-header">
-            <h1>蛋白质热稳定性优化</h1>
-            <p>在给定结构的前提下，智能推荐少量点突变方案以提升序列热稳定性，替代“全量实验扫描”，显著缩小验证空间。</p>
+            <h1>蛋白质序列设计</h1>
+            <p>输入蛋白质的三维结构骨架（Backbone），模型能够设计出可折叠形成该结构的氨基酸序列，将“结构蓝图”变为“分子实体”。</p>
         </header>
 
+        <!-- 两栏布局容器 -->
         <div id="main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
 
+            <!-- 左侧栏: 输入与输出 -->
             <div id="left-column" class="lg:col-span-7 flex flex-col gap-8 transition-all duration-500 ease-in-out">
+                <!-- 输入与参数卡片 -->
                 <section class="content-card" id="input-parameters-section">
                     <nav class="tabs">
                         <button class="tab-link active" onclick="openTab(event, 'input-tab')">输入</button>
-                        <button class="tab-link" onclick="openTab(event, 'params-tab')">可选参数</button>
+                        <button class="tab-link" onclick="openTab(event, 'params-tab')">解码参数</button>
                     </nav>
-
+                    <!-- 输入 Tab -->
                     <div id="input-tab" class="tab-content active">
                         <div class="form-group">
-                            <label for="pdb-input" class="form-label">输入蛋白质PDB结构文本</label>
-                            <textarea id="pdb-input" class="form-textarea" placeholder="请在此处粘贴PDB格式的文本..."></textarea>
-                        </div>
-                         <div class="form-group">
-                            <label for="fasta-input" class="form-label">输入蛋白质FASTA序列文本</label>
-                            <textarea id="fasta-input" class="form-textarea" placeholder=">Sequence_1..."></textarea>
+                            <label class="form-label">上传PDB文件</label>
+                            <div class="upload-area">
+                                <button class="upload-btn" onclick="document.getElementById('pdb-upload').click();">选择PDB文件</button>
+                                <span id="pdb-file-name">未选择任何文件</span>
+                                <input type="file" id="pdb-upload" accept=".pdb" style="display: none;">
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">或上传文件</label>
+                            <label for="fasta-input" class="form-label">输入蛋白质FASTA序列文本</label>
+                            <textarea id="fasta-input" class="form-textarea" placeholder=">Sequence_1
+MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHG..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">或上传FASTA文件</label>
                             <div class="upload-area">
-                                <button class="upload-btn" onclick="document.getElementById('file-upload').click();">选择PDB或FASTA文件</button>
-                                <span id="file-name">未选择任何文件</span>
-                                <input type="file" id="file-upload" accept=".pdb,.fasta,.fa" style="display: none;">
+                                <button class="upload-btn" onclick="document.getElementById('fasta-upload').click();">选择FASTA文件</button>
+                                <span id="fasta-file-name">未选择任何文件</span>
+                                <input type="file" id="fasta-upload" accept=".fasta,.fa" style="display: none;">
                             </div>
                         </div>
                     </div>
-
+                    <!-- 参数 Tab -->
                     <div id="params-tab" class="tab-content">
-                        <div class="param-option-group">
-                            <div>
-                                <label>
-                                    <input type="radio" name="optimization-mode" value="fix" checked onchange="toggleModeInputs()">
-                                    固定关键位点模式
-                                </label>
-                                <p class="text-sm text-gray-500 mt-1 pl-6">保护已知功能必需的氨基酸不被突变。</p>
-                                <input type="text" id="fix-sites-input" class="form-input" placeholder="例如: 25, 43-90, 103, 150">
-                            </div>
-                             <div>
-                                <label>
-                                    <input type="radio" name="optimization-mode" value="limit" onchange="toggleModeInputs()">
-                                    限定突变区域模式
-                                </label>
-                                <p class="text-sm text-gray-500 mt-1 pl-6">仅允许在特定区域进行突变探索。</p>
-                                <input type="text" id="limit-sites-input" class="form-input" placeholder="例如: 25, 43-90, 103, 150" disabled>
+                        <div class="form-group">
+                            <label class="form-label">解码策略 (Decoding Strategy)</label>
+                            <div class="param-option-group">
+                                <label><input type="radio" name="decoding-method" value="greedy" checked onchange="updateParamsView()"> 贪婪搜索 (Greedy)</label>
+                                <label><input type="radio" name="decoding-method" value="beam" onchange="updateParamsView()"> 波束搜索 (Beam)</label>
+                                <label><input type="radio" name="decoding-method" value="temperature" onchange="updateParamsView()"> 温度采样 (Sample)</label>
                             </div>
                         </div>
-                         <div class="form-group mt-6">
-                            <label for="return-count" class="form-label">设返回条数</label>
-                            <input type="number" id="return-count" class="form-input" min="1" max="20" value="5">
+                
+                        <!-- Greedy Search Params -->
+                        <div id="greedy-params" class="param-section">
+                            <p class="text-sm text-gray-600">每一步贪婪选择当前概率最高的氨基酸，是模型压缩知识的局部最优。<strong>只能返回一条结果。</strong></p>
+                        </div>
+                
+                        <!-- Beam Search Params -->
+                        <div id="beam-search-params" class="param-section" style="display: none;">
+                            <p class="text-sm text-gray-600 mb-4">同时保留 N 条最优候选路径（即束宽），探索更广的搜索空间，结果更接近全局最优。</p>
+                            <div class="form-group">
+                                <label for="beam-width" class="form-label">束宽 (Beam Width)</label>
+                                <select id="beam-width" class="form-select">
+                                    <option value="5">5</option>
+                                    <option value="10" selected>10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="return-count-beam" class="form-label">返回条数</label>
+                                <input type="number" id="return-count-beam" class="form-input" min="1" max="10" value="5">
+                                 <p class="text-xs text-gray-500 mt-1">返回条数不能超过束宽。</p>
+                            </div>
+                        </div>
+                
+                        <!-- Temperature Sampling Params -->
+                        <div id="temperature-params" class="param-section" style="display: none;">
+                            <p class="text-sm text-gray-600 mb-4">按概率分布进行随机采样，并通过“温度因子T”控制随机程度，能够生成更多样化的序列。</p>
+                            <div class="form-group">
+                                <label for="temperature-scaling" class="form-label">温度 (Temperature)</label>
+                                <input type="number" id="temperature-scaling" class="form-input" min="0" max="2.0" step="0.1" value="0.0" placeholder="输入 0 ~ 2.0 之间的小数">
+                                <p class="text-xs text-gray-500 mt-1">T=0 等效于贪婪搜索。T越大，随机性越强，多样性越高。</p>
+                            </div>
+                             <div class="form-group">
+                                <label for="return-count-temp" class="form-label">返回条数</label>
+                                <input type="number" id="return-count-temp" class="form-input" min="1" max="50" value="5">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                             <h3 class="text-lg font-semibold mb-2">策略对比</h3>
+                             <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                                 <strong>质量:</strong> 波束搜索 > 贪婪搜索 > 温度采样<br>
+                                 <strong>速度:</strong> 贪婪搜索 > 温度采样 ≈ 波束搜索<br>
+                                 <strong>多样性:</strong> 温度采样 >> 波束搜索 ≈ 贪婪搜索 = 0
+                             </p>
+                             <img src="images/功能详情页-蛋白质序列设计/111.png" alt="参数对比图" class="w-full h-auto rounded-lg border">
                         </div>
                     </div>
 
+                    <!-- 运行按钮 -->
                     <div class="action-buttons">
-                        <button class="btn btn-primary" id="run-btn">运行热稳定性优化</button>
+                        <button class="btn btn-primary" id="run-btn">运行序列设计</button>
                         <button class="btn btn-secondary" id="clear-btn">清空</button>
                     </div>
                     <div id="loader" class="text-center mt-4" style="display: none;">
                         <svg class="animate-spin h-8 w-8 text-cyan-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <p class="mt-2 text-gray-600">正在优化，请稍候...</p>
+                        <p class="mt-2 text-gray-600">正在生成序列，请稍候...</p>
                     </div>
                 </section>
-                
+                <!-- 输出卡片 -->
                 <section class="content-card" id="output-section" style="display: none;">
-                    <h2>结果预览</h2>
-                    <p>优化已完成。下方展示优化后的氨基酸序列，可在比对视图中快速定位突变/固定位点。</p>
-                    <p class="text-sm bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-3 rounded-md my-4"><strong>提示：</strong>提高热稳定性可能伴随蛋白质活性下降。请在比对视图中重点核查催化残基、配位或结合位点等关键氨基酸，剔除涉及关键位点的候选序列。</p>
-                    
-                    <nav class="tabs mt-4">
-                        <button class="tab-link active" onclick="openOutputTab(event, 'alignment-view-tab')">突变比对</button>
-                        <button class="tab-link" onclick="openOutputTab(event, 'fasta-output-tab')">FASTA序列</button>
-                    </nav>
-
-                    <div id="alignment-view-tab" class="output-tab-content active">
-                        <div id="alignment-view" class="alignment-view">
-                            <!-- JS动态生成比对结果 -->
-                        </div>
-                    </div>
-
-                    <div id="fasta-output-tab" class="output-tab-content">
-                        <div class="output-actions">
-                           <button class="btn btn-primary text-sm px-4 py-2" id="download-btn">下载结果 (.fasta)</button>
-                        </div>
-                        <div class="output-wrapper mt-4">
-                           <pre id="output-fasta"></pre>
-                        </div>
-                    </div>
+                      <h2>结果预览</h2>
+                      <p>序列生成完成！您可以在下方查看结果，并下载FASTA格式的完整文件。</p>
+                      <div class="output-actions">
+                          <button class="btn btn-primary text-sm px-4 py-2" id="download-btn">下载结果 (.fasta)</button>
+                      </div>
+                      <div class="output-wrapper mt-4">
+                          <pre id="output-fasta"></pre>
+                      </div>
                 </section>
             </div>
-
+            
             <button id="collapse-btn" class="absolute top-1/2 right-[41.666667%] -translate-y-1/2 translate-x-1/2 z-30 bg-white hover:bg-cyan-500 text-cyan-600 hover:text-white rounded-full w-10 h-10 shadow-lg flex items-center justify-center transition-all duration-500 ease-in-out">
                 <svg id="collapse-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300">
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
             </button>
 
+            <!-- 右侧栏: 介绍与示例 -->
             <div id="right-column" class="lg:col-span-5 transition-all duration-500 ease-in-out">
                 <div class="sticky top-28 flex flex-col gap-8">
+                      <!-- 详情介绍卡片 -->
                     <section id="details-section" class="content-card">
                         <nav class="tabs">
                             <button class="tab-link active" onclick="openDetailTab(event, 'intro-content')">能力介绍</button>
                             <button class="tab-link" onclick="openDetailTab(event, 'example-content')">使用示例</button>
                         </nav>
-                        
+                        <!-- 能力介绍 -->
                         <div id="intro-content" class="detail-tab-content active">
                             <h2>能力介绍</h2>
-                            <p>提升蛋白质热稳定性常需通过大量实验筛选有效突变，成本高且效率低；我们通过 <strong>结构-柔性</strong> 联合表征解析位点特性，结合多指标打分与嗜热蛋白微调模型，智能推荐最优突变方案，大幅降低实验探索成本。</p>
+                            <p>序列决定结构，结构决定功能，这是生命分子的基本法则。蛋白质序列设计旨在解决这一“逆问题”：给定一个期望的蛋白质三维结构，计算出能够稳定折叠成该结构的氨基酸序列。</p>
 
                             <ul class="list-disc list-inside mt-4 space-y-2">
-                                <li><strong>性能亮点:</strong> 结构-柔性联合表征刻画位点可动性与环境；结合界面/核心约束与经验先验做多指标打分；在嗜热蛋白数据上微调，对提升热稳定性更有把握。</li>
-                                <li><strong>模型优势:</strong> 集成 <strong>结构-环境</strong> 约束与经验先验，针对热稳定性优化设计多维度评分体系；模型经嗜热蛋白数据专项微调，能精准捕捉提升热稳定性的突变规律，相比传统方法更具针对性与可靠性。</li>
-                                <li><strong>操作简便:</strong> 用户上传蛋白质结构PDB文件和序列FASTA文件，选择固定不变或想改变的氨基酸位点，一键生成候选序列，并提供下载，便于用户进一步分析与应用。</li>
+                                <li><strong>性能亮点:</strong> 将B-factor等实验位移信息纳入建模，显式刻画局部与全局的可动性，提升模型对柔性的表征。结合自回归生成等更先进技术，更好地统摄全局依赖关系与长序列建模。</li>
+                                <li><strong>模型优势:</strong> <strong>SE(3) 等变结构编码器:</strong> 结合 B-factor 柔性先验，避免姿态伪差、显式感知可动性。利用交叉注意力机制对齐全局结构语义，兼顾长程依赖与条件化设计。</li>
+                                <li><strong>操作简便:</strong> 在本功能页中，用户上传PDB文件，设置相关参数即可一键生成候选序列，并提供下载，便于进一步分析与应用。</li>
                             </ul>
                         </div>
-
+                        <!-- 使用示例 -->
                         <div id="example-content" class="detail-tab-content">
                             <h2>使用示例</h2>
-                            <p>下图展示了输入PDB和FASTA文件，并设置参数后，一键运行优化并获得可下载结果的流程。点击图片可查看大图。</p>
-                            <img src="images/功能详情页-蛋白质热稳定性优化/14.png" alt="使用示例图片" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
-                            
-                            <!-- <h2 class="mt-6">示例文件下载</h2> -->
-                            <br>
-                            <div class="flex flex-wrap items-center gap-3 mt-2">
-                                <a class="btn btn-primary text-sm px-4 py-2" href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.fasta" download="t4rnl2.fasta">
-                                下载示例输入 (FASTA)
+                            <p>下图展示了输入PDB结构并设置参数后，生成候选序列并预览结果的完整流程。点击图片可查看大图。</p>
+                            <img src="images/功能详情页-蛋白质序列设计/11.png" alt="参数对比图" class="w-full h-auto rounded-lg mt-4 border cursor-zoom-in" onclick="openImageModal(this.src)">
+
+                            <!-- 示例文件下载（新增） -->
+                            <div class="output-actions" style="margin-top:16px;">
+                                <a class="btn btn-primary text-sm px-4 py-2"
+                                   href="files/功能详情页-蛋白质序列设计/example.pdb"
+                                   download="example.pdb">
+                                    下载示例输入 (PDB)
                                 </a>
-                                <a class="btn btn-primary text-sm px-4 py-2" href="files/功能详情页-蛋白质热稳定性优化/t4rnl2.pdb" download="t4rnl2.pdb">
-                                下载示例输入 (PDB)
+                                
+                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600"
+                                   href="files/功能详情页-蛋白质序列设计/example.fasta"
+                                   download="9kpp_pred.fasta">
+                                    下载示例输出 (FASTA)
                                 </a>
-                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600" href="files/功能详情页-蛋白质热稳定性优化/optimized_example_Tm.fasta" download="optimized_example_Tm.fasta">
-                                下载示例输出 (FASTA)
-                                </a>
-                            </div>
+                              </div>
                         </div>
                     </section>
                 </div>
             </div>
         </div>
+        <!-- 参考文献 (底部全宽) -->
         <section id="references-section" class="content-card mt-8">
             <h2>引用文献</h2>
             <blockquote><p>当前阶段未纳入引用文献，待内容进一步完善后将补充相关支撑文献。</p></blockquote>
         </section>
-
     </div>
 
+    <!-- Image Modal -->
     <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 z-[2000] flex items-center justify-center p-4 hidden transition-opacity duration-300">
         <span id="close-modal" class="absolute top-4 right-6 text-white text-5xl font-bold cursor-pointer hover:text-gray-300">&times;</span>
         <img id="modal-image" src="" alt="放大的示例图片" class="max-w-full max-h-full rounded-lg shadow-2xl">
     </div>
 
     <script>
+        // Tab 切换 (输入/参数)
         function openTab(evt, tabName) {
-            document.querySelectorAll("#input-parameters-section .tab-content").forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll("#input-parameters-section .tab-link").forEach(link => link.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            evt.currentTarget.classList.add('active');
+            const tabcontent = document.querySelectorAll("#input-parameters-section .tab-content");
+            tabcontent.forEach(tab => tab.style.display = "none");
+            const tablinks = document.querySelectorAll("#input-parameters-section .tab-link");
+            tablinks.forEach(link => link.className = link.className.replace(" active", ""));
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
         }
 
+        // Tab 切换 (详情/示例)
         function openDetailTab(evt, tabName) {
-            document.querySelectorAll("#details-section .detail-tab-content").forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll("#details-section .tab-link").forEach(link => link.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            evt.currentTarget.classList.add('active');
-        }
-        
-        function openOutputTab(evt, tabName) {
-            document.querySelectorAll("#output-section .output-tab-content").forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll("#output-section .tab-link").forEach(link => link.classList.remove('active'));
+            const tabcontent = document.querySelectorAll("#details-section .detail-tab-content");
+            tabcontent.forEach(tab => tab.classList.remove('active'));
+            const tablinks = document.querySelectorAll("#details-section .tab-link");
+            tablinks.forEach(link => link.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
             evt.currentTarget.classList.add('active');
         }
 
+        // 切换解码参数的显示
+        function updateParamsView() {
+            const selectedMethod = document.querySelector('input[name="decoding-method"]:checked').value;
+            document.getElementById('greedy-params').style.display = 'none';
+            document.getElementById('beam-search-params').style.display = 'none';
+            document.getElementById('temperature-params').style.display = 'none';
 
-        function toggleModeInputs() {
-            const mode = document.querySelector('input[name="optimization-mode"]:checked').value;
-            const fixInput = document.getElementById('fix-sites-input');
-            const limitInput = document.getElementById('limit-sites-input');
-            if (mode === 'fix') {
-                fixInput.disabled = false;
-                limitInput.disabled = true;
-                limitInput.value = '';
-            } else {
-                fixInput.disabled = true;
-                fixInput.value = '';
-                limitInput.disabled = false;
+            if (selectedMethod === 'greedy') {
+                document.getElementById('greedy-params').style.display = 'block';
+            } else if (selectedMethod === 'beam') {
+                document.getElementById('beam-search-params').style.display = 'block';
+            } else if (selectedMethod === 'temperature') {
+                document.getElementById('temperature-params').style.display = 'block';
             }
         }
-
-        const fileUpload = document.getElementById('file-upload');
-        const fileNameSpan = document.getElementById('file-name');
-        fileUpload.addEventListener('change', () => { 
-            fileNameSpan.textContent = fileUpload.files.length > 0 ? fileUpload.files[0].name : '未选择任何文件';
+        
+        // 约束波束搜索的返回条数
+        const beamWidthSelect = document.getElementById('beam-width');
+        const beamReturnCountInput = document.getElementById('return-count-beam');
+        beamWidthSelect.addEventListener('change', () => {
+            const maxWidth = parseInt(beamWidthSelect.value, 10);
+            beamReturnCountInput.max = maxWidth;
+            if (parseInt(beamReturnCountInput.value, 10) > maxWidth) {
+                beamReturnCountInput.value = maxWidth;
+            }
         });
 
+
+        // 文件上传显示文件名
+        const pdbFileUpload = document.getElementById('pdb-upload');
+        const pdbFileNameSpan = document.getElementById('pdb-file-name');
+        const fastaFileUpload = document.getElementById('fasta-upload');
+        const fastaFileNameSpan = document.getElementById('fasta-file-name');
+
+        pdbFileUpload.addEventListener('change', () => { 
+            pdbFileNameSpan.textContent = pdbFileUpload.files.length > 0 ? pdbFileUpload.files[0].name : '未选择任何文件';
+        });
+
+        fastaFileUpload.addEventListener('change', () => { 
+            fastaFileNameSpan.textContent = fastaFileUpload.files.length > 0 ? fastaFileUpload.files[0].name : '未选择任何文件';
+        });
+
+        // 清空按钮功能
         const clearBtn = document.getElementById('clear-btn');
+        const outputSection = document.getElementById('output-section');
+        const fastaInput = document.getElementById('fasta-input');
+
         clearBtn.addEventListener('click', () => {
-            document.getElementById('pdb-input').value = '';
-            document.getElementById('fasta-input').value = '';
-            fileUpload.value = '';
-            fileNameSpan.textContent = '未选择任何文件';
-            document.querySelector('input[name="optimization-mode"][value="fix"]').checked = true;
-            toggleModeInputs();
-            document.getElementById('fix-sites-input').value = '';
-            document.getElementById('limit-sites-input').value = '';
-            document.getElementById('return-count').value = '5';
-            document.getElementById('output-section').style.display = 'none';
+            pdbFileUpload.value = '';
+            pdbFileNameSpan.textContent = '未选择任何文件';
+            fastaInput.value = '';
+            fastaFileUpload.value = '';
+            fastaFileNameSpan.textContent = '未选择任何文件';
+            // Reset params
+            document.querySelector('input[name="decoding-method"][value="greedy"]').checked = true;
+            document.getElementById('beam-width').value = "10";
+            document.getElementById('return-count-beam').value = "5";
+            document.getElementById('return-count-beam').max = "10";
+            document.getElementById('temperature-scaling').value = "0.0";
+            document.getElementById('return-count-temp').value = "5";
+            updateParamsView(); // Reset view to show correct params
+            outputSection.style.display = 'none'; // 隐藏输出区域
         });
 
+        // 模拟运行
         const runBtn = document.getElementById('run-btn');
         const loader = document.getElementById('loader');
         const outputFasta = document.getElementById('output-fasta');
-        const alignmentView = document.getElementById('alignment-view');
-        
-        const mockFastaResult = `>optimized_example_Tm
-MFKKYSSLENHYNSKFIEKLYSLGLTKGEWVAREKIHGTNFSLIIERDKVTCAKRTGPIL
-PAEDFFGYEIILKNYADSIKAVQDIMETSAVVSYQVFGEFAGPGIQKNVDYCDKDFYVFD
-IIVTTESGDVTYVDDHMMESFCNTFKFKMAPLLGRGKFEELIKLPNGLDSVVQDYNFTVD
-HAGQVDANKCVWNAEAKGEVFTAKGYVLKPCYPSWLRNGNRVAIKCKNSKFSEKKKSDKP
-IKAKVYLSEADNKLVGILACYVTLNRVNNVISKIGEIGPKDFGKVMGLTVQDILEETSRE
-GITLTQADNPSLIKKELVKMVQDVLRPAWIELVS`;
-
-        function parseFasta(fastaString) {
-            const sequences = [];
-            const lines = fastaString.trim().split('\n');
-            let currentHeader = '';
-            let currentSequence = '';
-
-            for (const line of lines) {
-                if (line.startsWith('>')) {
-                    if (currentHeader) {
-                        sequences.push({ header: currentHeader, sequence: currentSequence.replace(/\s/g, '') });
-                    }
-                    currentHeader = line.substring(1);
-                    currentSequence = '';
-                } else {
-                    currentSequence += line.trim();
-                }
-            }
-            if (currentHeader) {
-                sequences.push({ header: currentHeader, sequence: currentSequence.replace(/\s/g, '') });
-            }
-            return sequences;
-        }
-        
-        function createAlignmentHTML(originalSeq, optimizedEntry) {
-            let html = `<div class="alignment-block">`;
-            html += `<div class="alignment-header">${optimizedEntry.header}</div>`;
-            html += `<table class="alignment-table">`;
-            
-            const chunkSize = 60;
-            
-            for (let i = 0; i < originalSeq.length; i += chunkSize) {
-                const startPos = i + 1;
-                
-                const originalChunk = originalSeq.substring(i, i + chunkSize);
-                const optimizedChunk = optimizedEntry.sequence.substring(i, i + chunkSize);
-                
-                let rulerLine = ' '.repeat(chunkSize);
-                let originalLine = '';
-                let optimizedLine = '';
-
-                for(let j=0; j < originalChunk.length; j++) {
-                    const originalChar = originalChunk[j];
-                    const optimizedChar = optimizedChunk[j];
-
-                    if (originalChar === optimizedChar) {
-                        originalLine += `<span class="unchanged">${originalChar}</span>`;
-                        optimizedLine += `<span class="unchanged">${optimizedChar}</span>`;
-                    } else {
-                        originalLine += `<span class="mutated">${originalChar}</span>`;
-                        optimizedLine += `<span class="mutated">${optimizedChar}</span>`;
-                    }
-                    
-                    const currentPos = i + j + 1;
-                    if (currentPos % 10 === 0) {
-                        const numStr = currentPos.toString();
-                        const startIdx = j - numStr.length + 1;
-                        if(startIdx >= 0) {
-                           rulerLine = rulerLine.substring(0, startIdx) + numStr + rulerLine.substring(j + 1);
-                        }
-                    } else if (currentPos % 5 === 0 && currentPos.toString().length === 1) { // Avoid overwriting numbers
-                        rulerLine = rulerLine.substring(0, j) + '.' + rulerLine.substring(j + 1);
-                    }
-                }
-                
-                html += `
-                    <tbody>
-                        <tr>
-                            <td class="label-col">${startPos}</td>
-                            <td class="seq-col ruler-line">${rulerLine}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col">Orig</td>
-                            <td class="seq-col">${originalLine}</td>
-                        </tr>
-                        <tr>
-                            <td class="label-col">Opti</td>
-                            <td class="seq-col">${optimizedLine}</td>
-                        </tr>
-                        <tr style="height: 1rem;"><td colspan="2"></td></tr>
-                    </tbody>
-                `;
-            }
-            
-            html += `</table></div>`;
-            return html;
-        }
-
+        const mockFastaResult = `>designed_seq_1 score=-0.12
+MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHG
+KKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTP
+AVHASLDKFLASVSTVLTSKYR
+>designed_seq_2 score=-0.15
+MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHG
+KKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTP
+AVHASLDKFLASVSTVLTSKYR
+>designed_seq_3 score=-0.18
+MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHG
+KKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTP
+AVHASLDKFLASVSTVLTSKYR`;
 
         runBtn.addEventListener('click', () => {
-            const originalFastaInput = document.getElementById('fasta-input').value;
-            if (!originalFastaInput || !originalFastaInput.includes('>')) {
-                alert('请输入有效的FASTA格式原始序列！');
-                return;
-            }
-
             loader.style.display = 'block';
             runBtn.disabled = true;
             clearBtn.disabled = true;
-
             setTimeout(() => {
                 loader.style.display = 'none';
                 runBtn.disabled = false;
                 clearBtn.disabled = false;
-                
                 outputFasta.textContent = mockFastaResult;
-
-                const originalSequences = parseFasta(originalFastaInput);
-                const optimizedSequences = parseFasta(mockFastaResult);
-                
-                if (originalSequences.length > 0 && optimizedSequences.length > 0) {
-                    const originalSeq = originalSequences[0].sequence;
-                    let alignmentHTML = '';
-                    optimizedSequences.forEach(optSeq => {
-                         if (originalSeq.length === optSeq.sequence.length) {
-                             alignmentHTML += createAlignmentHTML(originalSeq, optSeq);
-                         }
-                    });
-                    alignmentView.innerHTML = alignmentHTML;
-                }
-                
-                document.getElementById('output-section').style.display = 'block';
-                document.getElementById('output-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                outputSection.style.display = 'block';
+                outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 2000);
         });
 
+        // 下载结果
         document.getElementById('download-btn').addEventListener('click', () => {
             const fastaContent = outputFasta.textContent;
             const blob = new Blob([fastaContent], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'thermo_optimized.fasta';
+            a.download = 'designed_sequences.fasta';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         });
 
+        // 图片模态框 (Lightbox)
         const modal = document.getElementById('image-modal');
         const modalImg = document.getElementById('modal-image');
         const closeModalBtn = document.getElementById('close-modal');
@@ -642,9 +551,10 @@ GITLTQADNPSLIKKELVKMVQDVLRPAWIELVS`;
         modal.addEventListener('click', (e) => {
             if (e.target === modal) { closeImageModal(); }
         });
-        
+
+        // Initialize view on load
         document.addEventListener('DOMContentLoaded', () => {
-            toggleModeInputs();
+            updateParamsView();
         });
 
         // --- 折叠逻辑 ---
@@ -666,6 +576,7 @@ GITLTQADNPSLIKKELVKMVQDVLRPAWIELVS`;
             collapseBtn.classList.toggle('right-0'); // 折叠时的位置
             collapseIcon.classList.toggle('rotate-180');
         });
+
     </script>
 </body>
 </html>
