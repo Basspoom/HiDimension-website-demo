@@ -274,7 +274,7 @@
         </div>
         <header class="page-header">
             <h1>蛋白质结构预测</h1>
-            <p>构建一个兼具高效性与高精度的蛋白质结构预测模型，推理速度比肩 AlphaFold3，平均推理速度小于1分钟/条。</p>
+            <p>基于BiooFold1.0模型，兼具高效性与高精度的蛋白质结构预测。</p>
         </header>
 
         <div id="main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
@@ -366,11 +366,11 @@ MQYKLILNGKTLKGETTTEAVDAATAEKVFKQYANDNGVDGEWTYDDATKTFTVTE..."></textarea>
                         
                         <div id="intro-content" class="detail-tab-content active">
                             <h2>能力介绍</h2>
-                            <p>本任务旨在在基本保持预测精度的前提下，大幅提升蛋白质结构预测的效率。具体做法是利用蛋白质语言模型对序列进行解析，从而跳过传统的多序列比对（MSA）步骤，以显著降低推理开销。同时，将常用的序列比对模板搜索替换为基于嵌入的检索方法，使模型不仅运行更高效，也更容易搜索到远程同源蛋白质。</p>
+                            <p>进本任务旨在保持预测精度的前提下，大幅提升蛋白质结构预测的效率。借助自主开发的蛋白质语言模型与向量数据库，以优化传统的多序列比对（MSA）步骤，显著降低推理开销。</p>
                             <ul class="list-disc list-inside mt-4 space-y-2">
-                                <li><strong>性能亮点:</strong> 性能达到 AlphaFold3 的 90%。速度为 AlphaFold3 的 10 余倍，平均推理速度 <1 分钟每条。</li>
-                                <li><strong>模型优势:</strong> 该功能基于我们自主研发的 <strong>BiooSeek0.5</strong> 进行搜索，替代 MSA，从而显著提升推理效率。</li>
-                                <li><strong>操作简便:</strong> 在本功能页中，用户只需要输入蛋白质氨基酸序列，即可调用 <strong>BiooFold1.0</strong> 进行结构预测，输出蛋白质结构文件 (.pdb)，并提供下载，便于用户进一步分析与应用。</li>
+                                <li><strong>性能亮点:</strong> 性能媲美 AlphaFold3 的 单体蛋白预测能力。速度为 AlphaFold3 的 10 余倍，平均推理速度 <1 分钟每条。</li>
+                                <li><strong>模型优势:</strong> 该功能基于我们自主研发的 BiooSeek0.5 进行搜索，替代 MSA，从而显著提升推理效率。</li>
+                                <li><strong>操作简便:</strong> 在本功能页中，用户只需要输入蛋白质氨基酸序列，即可调用 BiooFold1.0 进行结构预测，输出蛋白质结构文件 (.pdb)，并提供下载，便于用户进一步分析与应用。</li>
                             </ul>
                     </div>
                         <div id="example-content" class="detail-tab-content">

@@ -190,7 +190,7 @@
 		</div>
 		<header class="page-header">
 			<h1>蛋白质结构补齐</h1>
-			<p>对晶体/冷冻电镜结构中缺失的片段（末端、插入段）进行快速补齐，输出物理可行、与整体几何一致的全长结构。</p>
+			<p>基于 BiooNovo 模型，对晶体/冷冻电镜/DeNovo结构中缺失的片段（末端、插入段）进行快速补齐，输出与整体几何一致的全长结构。</p>
 		</header>
 
 		<div id="main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
@@ -253,11 +253,11 @@
 						
 						<div id="intro-content" class="detail-tab-content active">
 							<h2>能力介绍</h2>
-							<p>很多PDB条目在低分辨密度处存在缺失残基；传统loop建模通过约束与采样补全该区段。我们提供基于深度学习的补齐方法，以显著提升速度与结构一致性。</p>
+							<p>很多PDB条目在低分辨密度处存在缺失残基；传统loop建模通过物理约束补全该区段。我们提供基于深度学习的补齐方法，以显著提升结构一致性。</p>
 
 							<ul class="list-disc list-inside mt-4 space-y-2">
-								<li><strong>性能亮点:</strong> 柔性感知的 SE(3) 编码器在缺失区邻域聚合上下文几何，结合约束式补齐与几何体检（键长/角、冲突）以减少不良构象。</li>
-								<li><strong>模型优势:</strong> B-factor先验提示可动性，模型在缺失段两端与邻域框架上做条件化生成，并联动几何与碰撞体检，降低不合理折返。</li>
+								<li><strong>性能亮点:</strong> 在掩码率80%的情况下，结构修复lddt高达0.95。</li>
+								<li><strong>模型优势:</strong> 模型融合B-factor知识，模型在缺失段两端与邻域框架上做条件化生成，并联动几何与碰撞体检，降低不合理折返。</li>
 								<li><strong>操作简便:</strong> 用户上传含缺失段的结构，可一键补齐并导出PDB结构文件，便于进一步的分析与应用。</li>
 							</ul>
 						</div>
