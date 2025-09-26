@@ -141,18 +141,21 @@
 			margin-bottom: 10px;
 			color: #495057;
 		}
-		.form-textarea {
+		.form-select, .form-textarea {
 			width: 100%;
 			padding: 12px 15px;
 			border: 1px solid var(--border-color);
 			border-radius: 8px;
-			font-size: 14px;
+			font-size: 16px;
 			transition: border-color 0.3s, box-shadow 0.3s;
+		}
+		.form-textarea {
 			min-height: 250px;
 			resize: vertical;
 			font-family: 'Courier New', Courier, monospace;
+			font-size: 14px;
 		}
-		.form-textarea:focus {
+		.form-select:focus, .form-textarea:focus {
 			outline: none;
 			border-color: var(--primary-color);
 			box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
@@ -190,22 +193,40 @@
 		</div>
 		<header class="page-header">
 			<h1>蛋白质结构补齐</h1>
-			<p>基于<strong> BiooNovo1.0 </strong>模型，对晶体/冷冻电镜/DeNovo结构中缺失片段（末端、插入段）快速补齐，输出与整体几何一致的全长结构。</p>
+			<p>基于 BiooNovo 模型，对晶体/冷冻电镜/DeNovo结构中缺失的片段（末端、插入段）进行快速补齐，输出与整体几何一致的全长结构。</p>
 		</header>
 
 		<div id="main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
 
 			<div id="left-column" class="lg:col-span-7 flex flex-col gap-8 transition-all duration-500 ease-in-out">
 				<section class="content-card" id="input-parameters-section">
-					<h2>输入结构</h2>
-					<div class="form-group">
-						<label class="form-label">上传PDB文件</label>
-						<div class="upload-area">
-							<button class="upload-btn" onclick="document.getElementById('file-upload').click();">选择文件</button>
-							<span id="file-name">未选择任何文件</span>
-							<input type="file" id="file-upload" accept=".pdb" style="display: none;">
-						</div>
-					</div>
+                    <nav class="tabs">
+                        <button class="tab-link active" onclick="openTab(event, 'input-tab')">输入</button>
+                        <button class="tab-link" onclick="openTab(event, 'params-tab')">可选参数</button>
+                    </nav>
+                     <!-- 输入 Tab -->
+                    <div id="input-tab" class="tab-content active">
+                        <div class="form-group">
+                            <label class="form-label">上传PDB文件</label>
+                            <div class="upload-area">
+                                <button class="upload-btn" onclick="document.getElementById('file-upload').click();">选择文件</button>
+                                <span id="file-name">未选择任何文件</span>
+                                <input type="file" id="file-upload" accept=".pdb" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 参数 Tab -->
+                    <div id="params-tab" class="tab-content">
+                        <div class="form-group">
+                            <label for="protein-chain" class="form-label">蛋白质链选择 (Protein Chain)</label>
+                            <select id="protein-chain" class="form-select">
+                                <option value="A" selected>A链</option>
+                                <option value="B">B链</option>
+                            </select>
+                             <p class="text-xs text-gray-500 mt-1">选择您希望进行补齐操作的目标蛋白质链。</p>
+                        </div>
+                    </div>
+
 					<div class="action-buttons">
 						<button class="btn btn-primary" id="run-btn">运行结构补齐</button>
 						<button class="btn btn-secondary" id="clear-btn">清空</button>
@@ -300,6 +321,16 @@
 	</div>
 
 	<script>
+        // Tab 切换 (输入/参数)
+        function openTab(evt, tabName) {
+            const tabcontent = document.querySelectorAll("#input-parameters-section .tab-content");
+            tabcontent.forEach(tab => tab.style.display = "none");
+            const tablinks = document.querySelectorAll("#input-parameters-section .tab-link");
+            tablinks.forEach(link => link.className = link.className.replace(" active", ""));
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
 		function openDetailTab(evt, tabName) {
 			const tabcontent = document.querySelectorAll("#details-section .detail-tab-content");
 			tabcontent.forEach(tab => tab.classList.remove('active'));
@@ -320,8 +351,11 @@
 		clearBtn.addEventListener('click', () => {
 			fileUpload.value = '';
 			fileNameSpan.textContent = '未选择任何文件';
+            document.getElementById('protein-chain').value = 'A';
 			outputSection.style.display = 'none';
 			viewersInitialized = false; // Allow re-initialization of viewers
+            // Reset tabs to default
+            openTab({ currentTarget: document.querySelector('#input-parameters-section .tab-link') }, 'input-tab');
 		});
 
 		const runBtn = document.getElementById('run-btn');
@@ -463,6 +497,12 @@ TER`;
 			collapseBtn.classList.toggle('right-0'); // 折叠时的位置
 			collapseIcon.classList.toggle('rotate-180');
 		});
+
+        // Initialize view on load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#input-parameters-section .tab-link.active').click();
+        });
 	</script>
 </body>
 </html>
+

@@ -218,7 +218,7 @@
         <!-- 页面标题介绍 -->
         <header class="page-header">
             <h1>蛋白质序列设计</h1>
-            <p>基于<strong> BiooNovo1.0 </strong>模型，模型能够设计出可折叠形成目标结构的氨基酸序列，将“结构蓝图”变为“分子实体”。</p>
+            <p>基于BiooNovo1.0模型，模型能够设计出可折叠形成目标结构的氨基酸序列，将“结构蓝图”变为“分子实体”。</p>
         </header>
 
         <!-- 两栏布局容器 -->
@@ -246,6 +246,14 @@
                     <!-- 参数 Tab -->
                     <div id="params-tab" class="tab-content">
                         <div class="form-group">
+                            <label for="protein-chain" class="form-label">蛋白质链选择 (Protein Chain)</label>
+                            <select id="protein-chain" class="form-select">
+                                <option value="A" selected>A链</option>
+                                <option value="B">B链</option>
+                            </select>
+                             <p class="text-xs text-gray-500 mt-1">选择您希望进行补齐操作的目标蛋白质链。</p>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">解码策略 (Decoding Strategy)</label>
                             <div class="param-option-group">
                                 <label><input type="radio" name="decoding-method" value="greedy" checked onchange="updateParamsView()"> 贪婪搜索 (Greedy)</label>
@@ -254,59 +262,41 @@
                             </div>
                         </div>
                 
-                        <!-- Decoding Params -->
-                        <div id="decoding-params" class="param-section">
-                            <h3 class="text-lg font-semibold mb-2">解码参数</h3>
-                            <div id="greedy-params">
-                                <p class="text-sm text-gray-600">每一步贪婪选择当前概率最高的氨基酸，是模型压缩知识的局部最优。<strong>只能返回一条结果。</strong></p>
+                        <!-- Greedy Search Params -->
+                        <div id="greedy-params" class="param-section">
+                            <p class="text-sm text-gray-600">每一步贪婪选择当前概率最高的氨基酸，是模型压缩知识的局部最优。<strong>只能返回一条结果。</strong></p>
+                        </div>
+                
+                        <!-- Beam Search Params -->
+                        <div id="beam-search-params" class="param-section" style="display: none;">
+                            <p class="text-sm text-gray-600 mb-4">同时保留 N 条最优候选路径（即束宽），探索更广的搜索空间，结果更接近全局最优。</p>
+                            <div class="form-group">
+                                <label for="beam-width" class="form-label">束宽 (Beam Width)</label>
+                                <select id="beam-width" class="form-select">
+                                    <option value="5">5</option>
+                                    <option value="10" selected>10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                </select>
                             </div>
-                            <div id="beam-search-params" style="display: none;">
-                                <p class="text-sm text-gray-600 mb-4">同时保留 N 条最优候选路径（即束宽），探索更广的搜索空间，结果更接近全局最优。</p>
-                                <div class="form-group">
-                                    <label for="beam-width" class="form-label">束宽 (Beam Width)</label>
-                                    <select id="beam-width" class="form-select">
-                                        <option value="5">5</option>
-                                        <option value="10" selected>10</option>
-                                        <option value="15">15</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="return-count-beam" class="form-label">返回条数</label>
-                                    <input type="number" id="return-count-beam" class="form-input" min="1" max="10" value="5">
-                                    <p class="text-xs text-gray-500 mt-1">返回条数不能超过束宽。</p>
-                                </div>
-                            </div>
-                            <div id="temperature-params" style="display: none;">
-                                <p class="text-sm text-gray-600 mb-4">按概率分布进行随机采样，并通过“温度因子T”控制随机程度，能够生成更多样化的序列。</p>
-                                <div class="form-group">
-                                    <label for="temperature-scaling" class="form-label">温度 (Temperature)</label>
-                                    <input type="number" id="temperature-scaling" class="form-input" min="0" max="2.0" step="0.1" value="0.0" placeholder="输入 0 ~ 2.0 之间的小数">
-                                    <p class="text-xs text-gray-500 mt-1">T=0 等效于贪婪搜索。T越大，随机性越强，多样性越高。</p>
-                                </div>
-                                <div class="form-group">
-                                    <label for="return-count-temp" class="form-label">返回条数</label>
-                                    <input type="number" id="return-count-temp" class="form-input" min="1" max="50" value="5">
-                                </div>
+                            <div class="form-group">
+                                <label for="return-count-beam" class="form-label">返回条数</label>
+                                <input type="number" id="return-count-beam" class="form-input" min="1" max="10" value="5">
+                                 <p class="text-xs text-gray-500 mt-1">返回条数不能超过束宽。</p>
                             </div>
                         </div>
-                        
-                        <div class="mt-8 pt-6 border-t border-gray-200">
-                             <label class="form-label">模式选择</label>
-                            <div class="param-option-group">
-                                <label><input type="radio" name="site-mode" value="all" checked onchange="toggleSiteInputs()"> 无位点限制</label>
-                                <label><input type="radio" name="site-mode" value="fix" onchange="toggleSiteInputs()"> 固定位点模式</label>
-                                <label><input type="radio" name="site-mode" value="limit" onchange="toggleSiteInputs()"> 限定突变区域模式</label>
+                
+                        <!-- Temperature Sampling Params -->
+                        <div id="temperature-params" class="param-section" style="display: none;">
+                            <p class="text-sm text-gray-600 mb-4">按概率分布进行随机采样，并通过“温度因子T”控制随机程度，能够生成更多样化的序列。</p>
+                            <div class="form-group">
+                                <label for="temperature-scaling" class="form-label">温度 (Temperature)</label>
+                                <input type="number" id="temperature-scaling" class="form-input" min="0" max="2.0" step="0.1" value="0.0" placeholder="输入 0 ~ 2.0 之间的小数">
+                                <p class="text-xs text-gray-500 mt-1">T=0 等效于贪婪搜索。T越大，随机性越强，多样性越高。</p>
                             </div>
-                            <div id="site-params" class="param-section" style="display: none;">
-                                <div id="fix-sites-group" style="display:none;">
-                                    <p class="text-sm text-gray-600 mb-2">保护已知功能必需的氨基酸不被突变。</p>
-                                    <input type="text" id="fix-sites-input" class="form-input" placeholder="例如: 25, 43-90, 103, 150">
-                                </div>
-                                <div id="limit-sites-group" style="display:none;">
-                                    <p class="text-sm text-gray-600 mb-2">仅允许在特定区域进行突变探索。</p>
-                                    <input type="text" id="limit-sites-input" class="form-input" placeholder="例如: 25, 43-90, 103, 150">
-                                </div>
+                             <div class="form-group">
+                                <label for="return-count-temp" class="form-label">返回条数</label>
+                                <input type="number" id="return-count-temp" class="form-input" min="1" max="50" value="5">
                             </div>
                         </div>
                         
@@ -445,26 +435,6 @@
             }
         }
         
-        // 切换位点模式的显示
-        function toggleSiteInputs() {
-            const mode = document.querySelector('input[name="site-mode"]:checked').value;
-            const siteParams = document.getElementById('site-params');
-            const fixSitesGroup = document.getElementById('fix-sites-group');
-            const limitSitesGroup = document.getElementById('limit-sites-group');
-
-            siteParams.style.display = 'none';
-            fixSitesGroup.style.display = 'none';
-            limitSitesGroup.style.display = 'none';
-
-            if (mode === 'fix') {
-                siteParams.style.display = 'block';
-                fixSitesGroup.style.display = 'block';
-            } else if (mode === 'limit') {
-                siteParams.style.display = 'block';
-                limitSitesGroup.style.display = 'block';
-            }
-        }
-
         // 约束波束搜索的返回条数
         const beamWidthSelect = document.getElementById('beam-width');
         const beamReturnCountInput = document.getElementById('return-count-beam');
@@ -492,22 +462,18 @@
         const clearBtn = document.getElementById('clear-btn');
         const outputSection = document.getElementById('output-section');
         clearBtn.addEventListener('click', () => {
-            // 移除pdb-input的清空逻辑
-            // document.getElementById('pdb-input').value = ''; 
             fileUpload.value = '';
             fileNameSpan.textContent = '未选择任何文件';
+            // Reset chain selection
+            document.getElementById('protein-chain').value = "A";
             // Reset params
             document.querySelector('input[name="decoding-method"][value="greedy"]').checked = true;
-            document.querySelector('input[name="site-mode"][value="all"]').checked = true;
             document.getElementById('beam-width').value = "10";
             beamReturnCountInput.value = "5";
             beamReturnCountInput.max = "10";
             document.getElementById('temperature-scaling').value = "0.0";
             document.getElementById('return-count-temp').value = "5";
-            document.getElementById('fix-sites-input').value = '';
-            document.getElementById('limit-sites-input').value = '';
             updateParamsView(); // Reset view to show correct params
-            toggleSiteInputs(); // Reset view to show correct inputs
             outputSection.style.display = 'none'; // 隐藏输出区域
         });
 
@@ -578,7 +544,6 @@ AVHASLDKFLASVSTVLTSKYR`;
         // Initialize view on load
         document.addEventListener('DOMContentLoaded', () => {
             updateParamsView();
-            toggleSiteInputs();
         });
 
         // --- 折叠逻辑 ---
@@ -600,6 +565,7 @@ AVHASLDKFLASVSTVLTSKYR`;
             collapseBtn.classList.toggle('right-0'); // 折叠时的位置
             collapseIcon.classList.toggle('rotate-180');
         });
+
     </script>
 </body>
 </html>
