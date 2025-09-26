@@ -264,12 +264,12 @@
                 
                         <!-- Greedy Search Params -->
                         <div id="greedy-params" class="param-section">
-                            <p class="text-sm text-gray-600">每一步贪婪选择当前概率最高的氨基酸，是模型压缩知识的局部最优。<strong>只能返回一条结果。</strong></p>
+                            <p class="text-sm text-gray-600">每一步贪婪选择当前概率最高的氨基酸，是模型压缩知识的局部最优。<strong>只返回一条结果。</strong></p>
                         </div>
                 
                         <!-- Beam Search Params -->
                         <div id="beam-search-params" class="param-section" style="display: none;">
-                            <p class="text-sm text-gray-600 mb-4">同时保留 N 条最优候选路径（即束宽），探索更广的搜索空间，结果更接近全局最优。</p>
+                            <p class="text-sm text-gray-600 mb-4">同时保留 N 条最优候选路径（即束宽），探索更广的搜索空间，结果更接近全局最优。<strong>只返回一条结果。</strong></p>
                             <div class="form-group">
                                 <label for="beam-width" class="form-label">束宽 (Beam Width)</label>
                                 <select id="beam-width" class="form-select">
@@ -279,11 +279,11 @@
                                     <option value="20">20</option>
                                 </select>
                             </div>
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label for="return-count-beam" class="form-label">返回条数</label>
                                 <input type="number" id="return-count-beam" class="form-input" min="1" max="10" value="5">
                                  <p class="text-xs text-gray-500 mt-1">返回条数不能超过束宽。</p>
-                            </div>
+                            </div> -->
                         </div>
                 
                         <!-- Temperature Sampling Params -->
