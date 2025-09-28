@@ -299,7 +299,28 @@
                                 <input type="number" id="return-count-temp" class="form-input" min="1" max="50" value="5">
                             </div>
                         </div>
+
                         
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <label class="form-label">模式选择</label>
+                           <div class="param-option-group">
+                               <label><input type="radio" name="site-mode" value="all" checked onchange="toggleSiteInputs()"> 无位点限制</label>
+                               <label><input type="radio" name="site-mode" value="fix" onchange="toggleSiteInputs()"> 固定位点模式</label>
+                               <label><input type="radio" name="site-mode" value="limit" onchange="toggleSiteInputs()"> 限定突变区域模式</label>
+                           </div>
+                           <div id="site-params" class="param-section" style="display: none;">
+                               <div id="fix-sites-group" style="display:none;">
+                                   <p class="text-sm text-gray-600 mb-2">保护已知功能必需的氨基酸不被突变。</p>
+                                   <input type="text" id="fix-sites-input" class="form-input" placeholder="例如: 25, 43-90, 103, 150">
+                               </div>
+                               <div id="limit-sites-group" style="display:none;">
+                                   <p class="text-sm text-gray-600 mb-2">仅允许在特定区域进行突变探索。</p>
+                                   <input type="text" id="limit-sites-input" class="form-input" placeholder="例如: 25, 43-90, 103, 150">
+                               </div>
+                           </div>
+                       </div>
+                       
+
                         <div class="mt-8 pt-6 border-t border-gray-200">
                              <h3 class="text-lg font-semibold mb-2">策略对比</h3>
                              <p class="text-sm text-gray-600 mb-4 leading-relaxed">
@@ -434,6 +455,27 @@
                 document.getElementById('temperature-params').style.display = 'block';
             }
         }
+
+        // 切换位点模式的显示
+        function toggleSiteInputs() {
+            const mode = document.querySelector('input[name="site-mode"]:checked').value;
+            const siteParams = document.getElementById('site-params');
+            const fixSitesGroup = document.getElementById('fix-sites-group');
+            const limitSitesGroup = document.getElementById('limit-sites-group');
+
+            siteParams.style.display = 'none';
+            fixSitesGroup.style.display = 'none';
+            limitSitesGroup.style.display = 'none';
+
+            if (mode === 'fix') {
+                siteParams.style.display = 'block';
+                fixSitesGroup.style.display = 'block';
+            } else if (mode === 'limit') {
+                siteParams.style.display = 'block';
+                limitSitesGroup.style.display = 'block';
+            }
+        }
+
         
         // 约束波束搜索的返回条数
         const beamWidthSelect = document.getElementById('beam-width');
