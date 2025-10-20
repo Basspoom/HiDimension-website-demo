@@ -318,26 +318,45 @@
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 12px;
         }
-        .db-option input[type="radio"] { display: none; }
+        .db-option input[type="checkbox"] { display: none; }
         .db-option span {
-            display: block;
-            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 64px;
+            padding: 8px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
             font-weight: 500;
+            line-height: 1.4;
         }
         .db-option span:hover {
             border-color: var(--primary-color);
             color: var(--primary-color);
         }
-        .db-option input[type="radio"]:checked + span {
+        .db-option input[type="checkbox"]:checked + span {
             background-color: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
             box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+        }
+        .db-option span small {
+            font-size: 12px;
+            font-weight: normal;
+            color: var(--subtle-text-color);
+            transition: color 0.2s ease-in-out;
+        }
+        .db-option span:hover small {
+             color: var(--primary-color);
+        }
+        .db-option input[type="checkbox"]:checked + span small {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        #db-description-box {
+            transition: background-color 0.3s ease;
         }
     </style>
 </head>
@@ -386,12 +405,83 @@
                     <!-- 参数 Tab -->
                     <div id="params-tab" class="tab-content">
                         <div class="form-group">
-                            <label class="form-label">搜索数据库</label>
-                            <div class="db-group"><h3 class="db-group-title">RefSeq系列</h3><div class="db-options-grid"><label class="db-option"><input type="radio" name="search-db" value="bacteria" checked><span>细菌 (Bacteria)</span></label><label class="db-option"><input type="radio" name="search-db" value="archaea"><span>古菌 (Archaea)</span></label><label class="db-option"><input type="radio" name="search-db" value="virus"><span>病毒 (Virus)</span></label><label class="db-option"><input type="radio" name="search-db" value="fungi"><span>真菌 (Fungi)</span></label><label class="db-option"><input type="radio" name="search-db" value="plants"><span>植物 (Plants)</span></label></div></div>
-                            <div class="db-group"><h3 class="db-group-title">UniProt系列</h3><div class="db-options-grid"><label class="db-option"><input type="radio" name="search-db" value="swissprot"><span>Swiss-Prot</span></label><label class="db-option"><input type="radio" name="search-db" value="trembl"><span>TrEMBL</span></label></div></div>
-                            <div class="db-group"><h3 class="db-group-title">塰维系列</h3><div class="db-options-grid"><label class="db-option"><input type="radio" name="search-db" value="MEER"><span>MEER</span></label><label class="db-option"><input type="radio" name="search-db" value="hidata"><span>HiData</span></label><label class="db-option"><input type="radio" name="search-db" value="hidataP450"><span>HiData-P450</span></label></div></div>
+                            <label class="form-label">搜索数据库 (可多选)</label>
+                            
+                            <!-- RefSeq系列 -->
+                            <div class="db-group">
+                                <h3 class="db-group-title">RefSeq系列</h3>
+                                <div class="db-options-grid">
+                                    <label class="db-option" data-description="NCBI 中 RefSeq 收录的所有细菌蛋白质序列。">
+                                        <input type="checkbox" name="search-db" value="bacteria" checked><span>细菌<br><small>Bacteria</small></span>
+                                    </label>
+                                    <label class="db-option" data-description="NCBI 中 RefSeq 收录的所有古菌蛋白质序列。">
+                                        <input type="checkbox" name="search-db" value="archaea"><span>古菌<br><small>Archaea</small></span>
+                                    </label>
+                                    <label class="db-option" data-description="NCBI 中 RefSeq 收录的所有病毒蛋白质序列。">
+                                        <input type="checkbox" name="search-db" value="virus"><span>病毒<br><small>Virus</small></span>
+                                    </label>
+                                    <label class="db-option" data-description="NCBI 中 RefSeq 收录的所有真菌蛋白质序列。">
+                                        <input type="checkbox" name="search-db" value="fungi"><span>真菌<br><small>Fungi</small></span>
+                                    </label>
+                                    <label class="db-option" data-description="NCBI 中 RefSeq 收录的所有植物蛋白质序列。">
+                                        <input type="checkbox" name="search-db" value="plants"><span>植物<br><small>Plants</small></span>
+                                    </label>
+                                    <label class="db-option" data-description="NCBI 中 RefSeq 收录的所有动物（含哺乳动物、非哺乳类脊椎动物、无脊椎动物、原生动物）蛋白质序列。">
+                                        <input type="checkbox" name="search-db" value="animal"><span>动物<br><small>Animal</small></span>
+                                    </label>
+                                    <label class="db-option" data-description="NCBI 中 RefSeq 收录的所有亚细胞遗传元件（含质粒、质体、线粒体）的蛋白质序列。">
+                                        <input type="checkbox" name="search-db" value="subcellular"><span>亚细胞遗传元件<br><small>Subcellular</small></span>
+                                    </label>
+                                </div>
+                            </div>
 
+                            <!-- UniProt系列 -->
+                            <div class="db-group">
+                                <h3 class="db-group-title">UniProt系列</h3>
+                                <div class="db-options-grid">
+                                    <label class="db-option" data-description="高质量、经专家手动注释和审查的蛋白质序列数据库。">
+                                        <input type="checkbox" name="search-db" value="swissprot"><span>Swiss-Prot<br></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- 模式生物系列 -->
+                            <div class="db-group">
+                                <h3 class="db-group-title">模式生物系列</h3>
+                                <div class="db-options-grid">
+                                     <label class="db-option" data-description="包含 NCBI Genome 的所有 2313 株蓝藻。">
+                                        <input type="checkbox" name="search-db" value="cyanobacteria"><span>蓝藻<br><small>Cyanobacteria</small></span>
+                                    </label>
+                                     <label class="db-option" data-description="包含 NCBI Genome 的所有 228 株噬藻体。">
+                                        <input type="checkbox" name="search-db" value="cyanophage"><span>噬藻体<br><small>Cyanophage</small></span>
+                                    </label>
+                                     <label class="db-option" data-description="黑腹果蝇 (<i>Drosophila melanogaster</i>&#160;ISO1) 参考蛋白质组。">
+                                        <input type="checkbox" name="search-db" value="drosophila"><span>黑腹果蝇<br><small><i>D. melanogaster</i></small></span>
+                                    </label>
+                                     <label class="db-option" data-description="秀丽隐杆线虫 (<i>Caenorhabditis elegans</i>&#160;N2) 参考蛋白质组。">
+                                        <input type="checkbox" name="search-db" value="celegans"><span>秀丽隐杆线虫<br><small><i>C. elegans</i></small></span>
+                                    </label>
+                                     <label class="db-option" data-description="小家鼠 (<i>Mus musculus</i>&#160;C57BL/6J) 参考蛋白质组。">
+                                        <input type="checkbox" name="search-db" value="mus_musculus"><span>小家鼠<br><small><i>M. musculus</i></small></span>
+                                    </label>
+                                     <label class="db-option" data-description="非洲爪蟾 (<i>Xenopus laevis</i>&#160;J strain) 参考蛋白质组。">
+                                        <input type="checkbox" name="search-db" value="xenopus_laevis"><span>非洲爪蟾<br><small><i>X. laevis</i></small></span>
+                                    </label>
+                                     <label class="db-option" data-description="斑马鱼 (<i>Danio rerio</i>&#160;Tübingen) 参考蛋白质组。">
+                                        <input type="checkbox" name="search-db" value="danio_rerio"><span>斑马鱼<br><small><i>D. rerio</i></small></span>
+                                    </label>
+                                     <label class="db-option" data-description="人 (<i>Homo sapiens</i>&#160;GRCh38.p14) 参考蛋白质组。">
+                                        <input type="checkbox" name="search-db" value="homo_sapiens"><span>人<br><small><i>H. sapiens</i></small></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- 数据库介绍 -->
+                            <div id="db-description-box" class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 min-h-[50px] flex items-center">
+                                点击数据库以查看简介
+                            </div>
                         </div>
+
                         <div class="form-group">
                             <label for="record-count" class="form-label">记录条数</label>
                             <div class="flex items-center gap-4">
@@ -409,8 +499,6 @@
                      <h2>结果预览</h2>
                      <p>检索完成！以下是匹配得分最高的前50个结果。您可以下载完整CSV文件或复制预览表格。</p>
                      <div class="output-actions"><button class="btn btn-primary text-sm px-4 py-2">下载结果 (.csv)</button><button class="btn btn-secondary text-sm px-4 py-2 bg-gray-600">复制预览</button></div>
-                     <!-- <div class="output-table-wrapper mt-4"><table class="output-table"><thead><tr><th>输入查询蛋白名称</th><th>匹配到的蛋白ID</th><th>匹配分数</th><th>匹配到的蛋白的序列</th><th>匹配到的蛋白的名称</th></tr></thead><tbody><tr><td>Protein_A</td><td>WP_12345678.1</td><td>0.987</td><td class="font-mono text-xs truncate max-w-xs">MKLILNGKTLKGETTTEAVDAAT...</td><td>hypothetical protein [Lactobacillus]</td></tr><tr><td>Protein_A</td><td>WP_98765432.1</td><td>0.985</td><td class="font-mono text-xs truncate max-w-xs">MQYKLILNGKTLKGETTTEAVDA...</td><td>putative membrane protein [Bacillus]</td></tr><tr><td>Protein_A</td><td>XP_00123456.1</td><td>0.982</td><td class="font-mono text-xs truncate max-w-xs">MTYKLILNGKTLKGETTTEAVDA...</td><td>conserved protein [Streptococcus]</td></tr></tbody></table></div> -->
-                
                      <div class="output-table-wrapper mt-4">
                         <table class="output-table">
                           <thead>
@@ -515,7 +603,6 @@
     <script>
         // 下载示例文件
         function forceDownload(el){
-          // 如果是本地 file:// 打开，很多浏览器会无视 download，建议用 http 方式访问
           if (location.protocol === 'file:') {
               alert('建议用本地 HTTP 服务打开页面：例如运行  python -m http.server  后访问 http://localhost:8000');
           }
@@ -533,10 +620,9 @@
               URL.revokeObjectURL(a.href);
               a.remove();
           }).catch(()=>{
-                // 兜底退回普通跳转
               window.location.href = url;
           });
-          return false; // 阻止默认跳转
+          return false; 
           }
             
         // Tab 切换 (输入/参数)
@@ -559,79 +645,99 @@
             evt.currentTarget.classList.add('active');
         }
 
-        // 文件上传显示文件名
-        const fileUpload = document.getElementById('file-upload');
-        const fileNameSpan = document.getElementById('file-name');
-        fileUpload.addEventListener('change', () => { fileUpload.files.length > 0 ? fileNameSpan.textContent = fileUpload.files[0].name : fileNameSpan.textContent = '未选择任何文件'; });
+        // --- DOMContentLoaded 事件监听器 ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileUpload = document.getElementById('file-upload');
+            const fileNameSpan = document.getElementById('file-name');
+            const clearBtn = document.getElementById('clear-btn');
+            const outputSection = document.getElementById('output-section');
+            const runBtn = document.getElementById('run-btn');
+            const loader = document.getElementById('loader');
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-image');
+            const closeModalBtn = document.getElementById('close-modal');
+            const collapseBtn = document.getElementById('collapse-btn');
+            const collapseIcon = document.getElementById('collapse-icon');
+            const leftColumn = document.getElementById('left-column');
+            const rightColumn = document.getElementById('right-column');
+            const dbOptions = document.querySelectorAll('#params-tab .db-option');
+            const descriptionBox = document.getElementById('db-description-box');
+            const defaultDescription = '点击数据库以查看简介';
 
-        // 清空按钮功能
-        const clearBtn = document.getElementById('clear-btn');
-        const outputSection = document.getElementById('output-section');
-        clearBtn.addEventListener('click', () => {
-            document.getElementById('fasta-sequence').value = '';
-            fileUpload.value = '';
-            fileNameSpan.textContent = '未选择任何文件';
-            document.querySelector('input[name="search-db"][value="bacteria"]').checked = true;
-            document.getElementById('record-count').selectedIndex = 2; // 50
-            document.getElementById('custom-record-count').value = '';
-            outputSection.style.display = 'none'; // 隐藏输出区域
+            // 文件上传显示文件名
+            fileUpload.addEventListener('change', () => { 
+                fileNameSpan.textContent = fileUpload.files.length > 0 ? fileUpload.files[0].name : '未选择任何文件'; 
+            });
+
+            // 清空按钮功能
+            clearBtn.addEventListener('click', () => {
+                document.getElementById('fasta-sequence').value = '';
+                fileUpload.value = '';
+                fileNameSpan.textContent = '未选择任何文件';
+                
+                // 取消所有数据库勾选
+                document.querySelectorAll('input[name="search-db"]').forEach(cb => cb.checked = false);
+                // 重新勾选默认项
+                const defaultCheckbox = document.querySelector('input[name="search-db"][value="bacteria"]');
+                if (defaultCheckbox) defaultCheckbox.checked = true;
+                
+                document.getElementById('record-count').selectedIndex = 2; // 50
+                document.getElementById('custom-record-count').value = '';
+                outputSection.style.display = 'none'; // 隐藏输出区域
+                
+                // 重置数据库描述
+                if (descriptionBox) descriptionBox.innerHTML = defaultDescription;
+            });
+
+            // 模拟运行检索
+            runBtn.addEventListener('click', () => {
+                loader.style.display = 'block';
+                runBtn.disabled = true;
+                clearBtn.disabled = true;
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    runBtn.disabled = false;
+                    clearBtn.disabled = false;
+                    outputSection.style.display = 'block';
+                    outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 2000);
+            });
+
+            // 图片模态框 (Lightbox)
+            window.openImageModal = function(src) {
+                modalImg.src = src;
+                modal.classList.remove('hidden');
+            }
+            function closeImageModal() {
+                modal.classList.add('hidden');
+            }
+            closeModalBtn.addEventListener('click', closeImageModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) { closeImageModal(); }
+            });
+
+            // 折叠侧边栏
+            collapseBtn.addEventListener('click', () => {
+                leftColumn.classList.toggle('lg:col-span-7');
+                leftColumn.classList.toggle('lg:col-span-12');
+                rightColumn.classList.toggle('hidden');
+                collapseBtn.classList.toggle('right-[41.666667%]'); 
+                collapseBtn.classList.toggle('right-0'); 
+                collapseIcon.classList.toggle('rotate-180');
+            });
+            
+            // 数据库点击显示简介
+            if (descriptionBox) descriptionBox.innerHTML = defaultDescription;
+            dbOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const description = this.getAttribute('data-description');
+                    if (descriptionBox && description) {
+                        descriptionBox.innerHTML = description;
+                    }
+                });
+            });
         });
-
-        // 模拟运行检索
-        const runBtn = document.getElementById('run-btn');
-        const loader = document.getElementById('loader');
-        runBtn.addEventListener('click', () => {
-            loader.style.display = 'block';
-            runBtn.disabled = true;
-            clearBtn.disabled = true;
-            setTimeout(() => {
-                loader.style.display = 'none';
-                runBtn.disabled = false;
-                clearBtn.disabled = false;
-                outputSection.style.display = 'block';
-                outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 2000);
-        });
-
-        // 图片模态框 (Lightbox)
-        const modal = document.getElementById('image-modal');
-        const modalImg = document.getElementById('modal-image');
-        const closeModalBtn = document.getElementById('close-modal');
-
-        function openImageModal(src) {
-            modalImg.src = src;
-            modal.classList.remove('hidden');
-        }
-
-        function closeImageModal() {
-            modal.classList.add('hidden');
-        }
-
-        closeModalBtn.addEventListener('click', closeImageModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) { closeImageModal(); }
-        });
-
-        // --- 修改点 3: 更新折叠逻辑，使其可反复触发，并调整按钮位置 ---
-        const collapseBtn = document.getElementById('collapse-btn');
-        const collapseIcon = document.getElementById('collapse-icon');
-        const leftColumn = document.getElementById('left-column');
-        const rightColumn = document.getElementById('right-column');
-
-        collapseBtn.addEventListener('click', () => {
-            // 切换左侧栏的宽度
-            leftColumn.classList.toggle('lg:col-span-7');
-            leftColumn.classList.toggle('lg:col-span-12');
-
-            // 切换右侧栏的可见性
-            rightColumn.classList.toggle('hidden');
-
-            // 切换按钮的位置和图标方向
-            collapseBtn.classList.toggle('right-[41.666667%]'); // 展开时的位置 (5/12)
-            collapseBtn.classList.toggle('right-0'); // 折叠时的位置
-            collapseIcon.classList.toggle('rotate-180');
-        });
-
     </script>
 </body>
 </html>
+
