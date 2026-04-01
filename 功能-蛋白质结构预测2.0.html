@@ -464,10 +464,10 @@
                             </div>
 
                             <div class="mt-4 flex flex-wrap gap-3">
-                                <a class="btn btn-primary text-sm px-4 py-2" href="#">
+                                <a class="btn btn-primary text-sm px-4 py-2" href="files/功能详情页-蛋白质结构预测2.0/structure-prediction2-input.fasta" download="structure-prediction2-input.fasta">
                                    下载示例输入
                                 </a>
-                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600" href="#">
+                                <a class="btn btn-secondary text-sm px-4 py-2 bg-gray-600" href="files/功能详情页-蛋白质结构预测2.0/structure-prediction2-output.zip" download="structure-prediction2-output.zip">
                                    下载示例输出
                                 </a>
                               </div>
@@ -705,8 +705,20 @@
                     return r.text();
                 })
                 .then(data => {
-                    // 初始化 3Dmol viewer，并明确使用 "cif" 格式（原生地读取真实 B-factor / pLDDT 数据）
-                    initViewer(data, "cif");
+                    // 解析 pLDDT 数据（取倒数第二列的值）以修复默认解析的错位
+                    const plddtList = [];
+                    const lines = data.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('ATOM') || line.startsWith('HETATM')) {
+                            const parts = line.trim().split(/\s+/);
+                            // 按照提供的格式倒数第二列是 plddt 属性
+                            const plddt = parseFloat(parts[parts.length - 2]);
+                            plddtList.push(isNaN(plddt) ? 0 : plddt);
+                        }
+                    }
+
+                    // 初始化 3Dmol viewer，并将解析到的 plddtList 传进去强制替换
+                    initViewer(data, "cif", plddtList);
                     document.getElementById('result-section').scrollIntoView({behavior: 'smooth'});
                     
                     // 默认开启置信度着色
@@ -718,12 +730,24 @@
                 });
         }
 
-        function initViewer(structureData, format = "pdb") {
+        function initViewer(structureData, format = "pdb", plddtList = null) {
             const element = document.getElementById('pdb-viewer');
             if (viewer) viewer.clear();
             else viewer = $3Dmol.createViewer(element);
             
             viewer.addModel(structureData, format);
+            
+            // 修正原子的 b 属性 (即 pLDDT) 为自定义解析得到的数据
+            if (plddtList && plddtList.length > 0) {
+                const model = viewer.getModel();
+                const atoms = model.selectedAtoms({});
+                atoms.forEach((a, i) => {
+                    if (i < plddtList.length) {
+                        a.b = plddtList[i];
+                    }
+                });
+            }
+
             analyzeChains(viewer);
             applyCompositeStyle();
             
@@ -929,8 +953,8 @@
         // 修改点4：指向本地结果打包 ZIP 文件
         function downloadResult() {
             const a = document.createElement('a');
-            a.href = "files/功能详情页-蛋白质结构预测2.0/example_model_0.zip";
-            a.download = "example_model_0.zip";
+            a.href = "files/功能详情页-蛋白质结构预测2.0/structure-prediction2-output.zip";
+            a.download = "structure-prediction2-output.zip";
             document.body.appendChild(a);
             a.click();
             a.remove();
