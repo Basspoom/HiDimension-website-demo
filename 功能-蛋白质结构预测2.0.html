@@ -341,11 +341,6 @@
                         <!-- Updated Layout: Vertical Stack with strict integer validation -->
                         <div class="flex flex-col gap-6">
                             <div>
-                                <label class="block font-semibold mb-2 text-gray-700">迭代循环次数 (Recycle Steps)</label>
-                                <input type="number" id="recycle-step" class="form-input" min="1" max="20" value="10" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value>20)this.value=20; if(this.value<1 && this.value!=='')this.value=1;">
-                                <p class="text-xs text-gray-500 mt-1">默认 10 次，允许范围 1-20。对于复杂复合物，增加次数可提高准确率。</p>
-                            </div>
-                            <div>
                                 <label class="block font-semibold mb-2 text-gray-700">生成结构数量 (Num Structures)</label>
                                 <input type="number" id="num-structures" class="form-input" min="1" max="3" value="1" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value>3)this.value=3; if(this.value<1 && this.value!=='')this.value=1;">
                                 <p class="text-xs text-gray-500 mt-1">默认 1 个，允许范围 1-3。从不同的随机噪声种子开始采样。</p>
@@ -459,8 +454,15 @@
                         <div id="example-content" class="detail-tab-content">
                             <h2>使用示例</h2>
                             <p class="text-sm text-gray-700">输入蛋白质序列、DNA序列以及配体的 SMILES 式子，一键生成复合物结构。</p>
-                            <div class="bg-gray-100 rounded-lg h-48 flex items-center justify-center mt-4 border border-dashed border-gray-300 text-gray-500 overflow-hidden">
-                                <img src="https://via.placeholder.com/600x300?text=Complex+Prediction+Demo" alt="BiooFold 2.0 Demo" class="w-full h-full object-cover opacity-50">
+                            
+                            <!-- 优化图片展示：去除固定高度限制和多余边距，让图片自适应填满容器 -->
+                            <div class="mt-4 rounded-lg border border-gray-200 overflow-hidden cursor-pointer relative group shadow-sm hover:shadow-md transition-all" onclick="openImageModal(this.querySelector('img').src)" title="点击查看大图">
+                                <img src="images/功能详情页-蛋白质结构预测2.0/13.png" class="w-full h-auto block" alt="示例图">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-opacity flex items-center justify-center">
+                                    <div class="bg-black bg-opacity-60 text-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg transform scale-90 group-hover:scale-100 duration-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="mt-4 flex flex-wrap gap-3">
@@ -476,6 +478,14 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- 全屏图片查看模态框 -->
+    <div id="image-modal" class="fixed inset-0 z-[9999] bg-black bg-opacity-80 hidden flex justify-center items-center opacity-0 transition-opacity duration-300" onclick="closeImageModal()">
+        <button class="absolute top-6 right-6 text-gray-300 hover:text-white z-50 p-2 bg-black bg-opacity-50 rounded-full transition-colors" onclick="closeImageModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <img id="modal-image" src="" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
     </div>
 
     <!-- Script Logic -->
@@ -975,6 +985,33 @@
             collapseBtn.classList.toggle('right-0');
             collapseIcon.classList.toggle('rotate-180');
         });
+
+        // --- Image Modal Logic ---
+        function openImageModal(src) {
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-image');
+            modalImg.src = src;
+            modal.classList.remove('hidden');
+            // Trigger reflow
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            modalImg.classList.remove('scale-95');
+            modalImg.classList.add('scale-100');
+            document.body.style.overflow = 'hidden'; // 防止背景滚动
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-image');
+            modal.classList.add('opacity-0');
+            modalImg.classList.remove('scale-100');
+            modalImg.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
 
     </script>
 </body>
